@@ -1,0 +1,114 @@
+===========================================================================
+                              ax_lua2.m4
+===========================================================================
+
+SYNOPSIS
+
+  AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
+              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+
+DESCRIPTION
+
+  Detect a Lua interpreter, optionally specifying a minimum and maximum
+  version number. Set up important Lua paths, such as the directories in
+  which to install scripts and modules (shared libraries).
+
+  Also detect Lua headers and libraries. The Lua version contained in the
+  header is checked to match the Lua interpreter version exactly. When
+  searching for Lua libraries, the version number is used as a suffix. This
+  is done with the goal of supporting multiple Lua installs (5.1 and 5.2
+  side-by-side).
+
+
+  AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
+              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  -----------------------------------------------------
+
+  Search for the Lua interpreter, and set up important Lua paths.
+  Adds precious variable LUA, which may contain the path of the Lua
+  interpreter. If LUA is blank, the user's path is searched for an
+  suitable interpreter. The Lua version number LUA_VERSION if found from
+  the interpreter, and substituted. LUA_PLATFORM is also found, but not
+  currently supported (no standard representation).
+
+  LUA_PREFIX is set to '${prefix}', and LUA_EXEC_PREFIX is set to
+  '${exec_prefix}'. These variables can be overwritten, but should probably
+  be left alone. These are not precious variables.
+
+  Finally, the macro finds four paths:
+
+    luadir             Directory to install Lua scripts.
+    pkgluadir          ${luadir}/$PACKAGE
+    luaexecdir         Directory to install Lua modules.
+    pkgluaexecdir      ${luaexecdir}/$PACKAGE
+
+  These paths a found based on $prefix, $exec_prefix, Lua's package.path,
+  and package.cpath. The first path of package.path beginning with $prefix
+  is selected as luadir. The first path of package.cpath beginning with
+  $exec_prefix is used as luaexecdir. This should work on all reasonable
+  Lua installations. If a path cannot be determined, a default path is
+  used. Of course, the user can override these later when invoking make.
+
+    luadir             Default: $LUA_PREFIX/share/lua/$LUA_VERSION
+    luaexecdir         Default: $LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION
+
+
+  AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  --------------------------------------------------------------
+
+  Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
+  as necessary. Adds precious variable LUA_INCLUDES, which may contain
+  Lua specific include flags, e.g. -I/usr/include/lua5.1. If LUA_INCLUDES
+  is blank, and the headers cannot be found, then some common directories
+  are searched. If headers are then found, then LUA_INCLUDES is set to the
+  result.
+
+
+  AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  -----------------------------------------------------------
+
+  Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
+  macro as necessary. Adds precious variable LUA_LIBS, which may contain
+  Lua specific linker flags, e.g. -llua5.1. If LUA_LIBS is blank, then some
+  common flags are tested. If the link test succeeds, then LUA_INCLUDES is
+  set to the result.
+
+
+LICENSE
+
+  Copyright (C) 2012 Tim Perkins 2013 <tprk77@gmail.com>
+
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by the
+  Free Software Foundation, either version 3 of the License, or (at your
+  option) any later version.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+  Public License for more details.
+
+  You should have received a copy of the GNU General Public License along
+  with this program. If not, see <http://www.gnu.org/licenses/>.
+
+  As a special exception, the respective Autoconf Macro's copyright owner
+  gives unlimited permission to copy, distribute and modify the configure
+  scripts that are the output of Autoconf when processing the Macro. You
+  need not follow the terms of the GNU General Public License when using
+  or distributing such scripts, even though portions of the text of the
+  Macro appear in them. The GNU General Public License (GPL) does govern
+  all other use of the material that constitutes the Autoconf Macro.
+
+  This special exception to the GPL applies to versions of the Autoconf
+  Macro released by the Autoconf Archive. When you make and distribute a
+  modified version of the Autoconf Macro, you may extend this special
+  exception to the GPL to apply to your modified version as well.
+
+THANKS
+
+  This file was inspired by Andrew Dalke's and James Henstridge's python.m4
+  and Tom Payne's, Matthieu Moy's, and Reuben Thomas's ax_lua.m4 (serial
+  17). Basically, this file is a mashup of those two files. I like to think
+  it combines the best of the two!
