@@ -4,10 +4,10 @@
 
 SYNOPSIS
 
-  AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
+                      [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 
 DESCRIPTION
 
@@ -22,9 +22,9 @@ DESCRIPTION
   side-by-side).
 
 
-  AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  -----------------------------------------------------
+  AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
+                      [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  -------------------------------------------------------------
 
   Search for the Lua interpreter, and set up important Lua paths.
   Adds precious variable LUA, which may contain the path of the Lua
@@ -55,7 +55,7 @@ DESCRIPTION
     luaexecdir         Default: $LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION
 
 
-  AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
   --------------------------------------------------------------
 
   Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
@@ -66,7 +66,7 @@ DESCRIPTION
   result.
 
 
-  AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
   -----------------------------------------------------------
 
   Search for Lua libraries. Requires AX_LUA_PATH, and will expand that

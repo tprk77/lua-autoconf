@@ -4,10 +4,10 @@
 #
 # SYNOPSIS
 #
-#   AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-#               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
+#                       [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #
 # DESCRIPTION
 #
@@ -22,9 +22,9 @@
 #   side-by-side).
 #
 #
-#   AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-#               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   -----------------------------------------------------
+#   AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
+#                       [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   -------------------------------------------------------------
 #
 #   Search for the Lua interpreter, and set up important Lua paths.
 #   Adds precious variable LUA, which may contain the path of the Lua
@@ -55,7 +55,7 @@
 #     luaexecdir         Default: $LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION
 #
 #
-#   AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   --------------------------------------------------------------
 #
 #   Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
@@ -66,7 +66,7 @@
 #   result.
 #
 #
-#   AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   -----------------------------------------------------------
 #
 #   Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
@@ -115,7 +115,7 @@
 
 
 dnl =========================================================================
-dnl AX_PATH_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
+dnl AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
 dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 dnl
@@ -136,26 +136,27 @@ dnl If your package is configured with a different prefix to Lua,
 dnl users will have to add the install directory to the LUA_PATH
 dnl environment variable.
 dnl
-dnl If the MINIMUM-VERSION argument is passed, AX_PATH_LUA will
+dnl If the MINIMUM-VERSION argument is passed, AX_LUA_CHECK_INTERP will
 dnl cause an error if the version of Lua installed on the system
 dnl doesn't meet the requirement.  MINIMUM-VERSION should consist of
 dnl numbers and dots only. If the TOO-BIG-VERSION argument is
 dnl passed in addition to the MINIMUM-VERSION argument, then that
 dnl requirement will also be checked.
 dnl
-AC_DEFUN([AX_PATH_LUA], [_AX_LUA_PATH([$1], [$2], [$3], [$4])])
+AC_DEFUN([AX_LUA_CHECK_INTERP],
+  [_AX_LUA_CHECK_INTERP([$1], [$2], [$3], [$4])])
 
 
 dnl =========================================================================
-dnl _AX_LUA_PATH([MINIMUM-VERSION], [TOO-BIG-VERSION],
+dnl _AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
 dnl              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 dnl
-dnl Does the work of AX_PATH_LUA. This macro is used so that requisites
-dnl work as expected. This macro is an implementation detail, and should not
-dnl be used directly.
+dnl Does the work of AX_LUA_CHECK_INTERP. This macro is used so that
+dnl requisites work as expected. This macro is an implementation detail, and
+dnl should not be used directly.
 dnl
-AC_DEFUN([_AX_LUA_PATH],
+AC_DEFUN([_AX_LUA_CHECK_INTERP],
 [
   dnl Make LUA a precious variable.
   AC_ARG_VAR([LUA], [The Lua interpreter, e.g. /usr/bin/lua5.1])
@@ -172,7 +173,7 @@ AC_DEFUN([_AX_LUA_PATH],
 
     dnl At least check if this is a Lua interpreter.
     AC_MSG_CHECKING([if $LUA is a Lua interprester])
-    _AX_CHECK_LUA([$LUA],
+    _AX_LUA_CHK_IS_INTRP([$LUA],
       [AC_MSG_RESULT([yes])],
       [ AC_MSG_RESULT([no])
         AC_MSG_ERROR([not a Lua interpreter])
@@ -182,7 +183,7 @@ AC_DEFUN([_AX_LUA_PATH],
     AS_IF([test "x$LUA" != 'x'],
     [ dnl Check if this is a Lua interpreter.
       AC_MSG_CHECKING([if $LUA is a Lua interprester])
-      _AX_CHECK_LUA([$LUA],
+      _AX_LUA_CHK_IS_INTRP([$LUA],
         [AC_MSG_RESULT([yes])],
         [ AC_MSG_RESULT([no])
           AC_MSG_ERROR([not a Lua interpreter])
@@ -192,7 +193,7 @@ AC_DEFUN([_AX_LUA_PATH],
         [_ax_check_text="whether $LUA version >= $1"],
         [_ax_check_text="whether $LUA version >= $1, < $2"])
       AC_MSG_CHECKING([$_ax_check_text])
-      _AX_CHECK_VERSION([$LUA], [$1], [$2],
+      _AX_LUA_CHK_VER([$LUA], [$1], [$2],
         [AC_MSG_RESULT([yes])],
         [ AC_MSG_RESULT([no])
           AC_MSG_ERROR([version is out of range for specified LUA])])
@@ -206,8 +207,8 @@ AC_DEFUN([_AX_LUA_PATH],
         [ax_cv_pathless_LUA],
         [ for ax_cv_pathless_LUA in _AX_LUA_INTERPRETER_LIST none; do
             test "x$ax_cv_pathless_LUA" = 'xnone' && break
-            _AX_CHECK_LUA([$ax_cv_pathless_LUA], [], [continue])
-            _AX_CHECK_VERSION([$ax_cv_pathless_LUA], [$1], [$2], [break])
+            _AX_LUA_CHK_IS_INTRP([$ax_cv_pathless_LUA], [], [continue])
+            _AX_LUA_CHK_VER([$ax_cv_pathless_LUA], [$1], [$2], [break])
           done
         ])
       dnl Set $LUA to the absolute path of $ax_cv_pathless_LUA.
@@ -266,7 +267,7 @@ AC_DEFUN([_AX_LUA_PATH],
         ax_cv_lua_luadir="$LUA_PREFIX/share/lua/$LUA_VERSION"
 
         dnl Try to find a path with the prefix.
-        _AX_LUA_FIND_PREFIXED_PATH([$LUA], [$ax_lua_prefix], [package.path])
+        _AX_LUA_FND_PRFX_PTH([$LUA], [$ax_lua_prefix], [package.path])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
           _ax_strip_prefix=`echo "$ax_lua_prefix" | sed 's|.|.|g'`
@@ -295,7 +296,7 @@ AC_DEFUN([_AX_LUA_PATH],
         ax_cv_lua_luaexecdir="$LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION"
 
         dnl Try to find a path with the prefix.
-        _AX_LUA_FIND_PREFIXED_PATH([$LUA],
+        _AX_LUA_FND_PRFX_PTH([$LUA],
           [$ax_lua_exec_prefix], [package.cpathd])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
@@ -316,21 +317,21 @@ AC_DEFUN([_AX_LUA_PATH],
 
 
 dnl =========================================================================
-dnl _AX_CHECK_LUA(PROG, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
+dnl _AX_LUA_CHK_IS_INTRP(PROG, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 dnl
 dnl Run ACTION-IF-TRUE if PROG is a Lua interpreter, or else run
 dnl ACTION-IF-FALSE otherwise. This macro is an implementation detail, and
 dnl should not be used directly.
 dnl
-AC_DEFUN([_AX_CHECK_LUA],
+AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 [
   AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" &>/dev/null],
     [$2], [$3])
 ])
 
 dnl =========================================================================
-dnl _AX_CHECK_VERSION(PROG, MINIMUM-VERSION, [TOO-BIG-VERSION],
+dnl _AX_LUA_CHK_VER(PROG, MINIMUM-VERSION, [TOO-BIG-VERSION],
 dnl                   [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 dnl
@@ -338,7 +339,7 @@ dnl Run ACTION-IF-TRUE if the Lua interpreter PROG has version >= VERSION.
 dnl Run ACTION-IF-FALSE otherwise. This macro is an implementation detail,
 dnl and should not be used directly.
 dnl
-AC_DEFUN([_AX_CHECK_VERSION],
+AC_DEFUN([_AX_LUA_CHK_VER],
 [
   _ax_test_ver=`$1 -e "print(_VERSION)" 2>/dev/null | \
     sed "s|^Lua \(.*\)|\1|" | grep -o "^@<:@0-9@:>@\+\\.@<:@0-9@:>@\+"`
@@ -354,7 +355,7 @@ AC_DEFUN([_AX_CHECK_VERSION],
 
 
 dnl =========================================================================
-dnl _AX_LUA_FIND_PREFIXED_PATH(PROG, PREFIX, LUA-PATH-VARIABLE)
+dnl _AX_LUA_FND_PRFX_PTH(PROG, PREFIX, LUA-PATH-VARIABLE)
 dnl =========================================================================
 dnl
 dnl Invokes the Lua interpreter PROG to print the path variable
@@ -363,7 +364,7 @@ dnl matched against PREFIX. The first path to begin with PREFIX is set to
 dnl ax_lua_prefixed_path. This macro is an implementation detail, and should
 dnl not be used directly.
 dnl
-AC_DEFUN([_AX_LUA_FIND_PREFIXED_PATH],
+AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
 [
   ax_lua_prefixed_path=''
   _ax_package_paths=`$1 -e 'print($3)' 2>/dev/null | sed 's|;|\n|g'`
@@ -388,7 +389,7 @@ AC_DEFUN([_AX_LUA_FIND_PREFIXED_PATH],
 
 
 dnl =========================================================================
-dnl AX_CHECK_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 dnl
 dnl Look for Lua headers. Always check if the Lua version in the headers
@@ -410,10 +411,10 @@ dnl
 dnl If the Lua headers are found, then ACTION-IF-FOUND is performed,
 dnl otherwise ACTION-IF-NOT-FOUND is pereformed instead.
 dnl
-AC_DEFUN([AX_CHECK_LUA_HEADERS],
+AC_DEFUN([AX_LUA_CHECK_HEADERS],
 [
-  dnl Requires LUA_VERSION from AX_PATH_LUA.
-  AC_REQUIRE([_AX_LUA_PATH])
+  dnl Requires LUA_VERSION from AX_LUA_CHECK_INTERP.
+  AC_REQUIRE([_AX_LUA_CHECK_INTERP])
 
   dnl Check for LUA_VERSION.
   AC_MSG_CHECKING([if LUA_VERSION is defined])
@@ -521,7 +522,7 @@ int main(int argc, char ** argv)
 
 
 dnl =========================================================================
-dnl AX_CHECK_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 dnl
 dnl Look for Lua libaries. The search is performed with the precious variable
@@ -533,10 +534,10 @@ dnl
 dnl If the Lua libs are found, then ACTION-IF-FOUND is performed,
 dnl otherwise ACTION-IF-NOT-FOUND is pereformed instead.
 dnl
-AC_DEFUN([AX_CHECK_LUA_LIBS],
+AC_DEFUN([AX_LUA_CHECK_LIBS],
 [
-  dnl Requires LUA_VERSION from AX_PATH_LUA.
-  AC_REQUIRE([_AX_LUA_PATH])
+  dnl Requires LUA_VERSION from AX_LUA_CHECK_INTERP.
+  AC_REQUIRE([_AX_LUA_CHECK_INTERP])
 
   dnl Check for LUA_VERSION.
   AC_MSG_CHECKING([if LUA_VERSION is defined])

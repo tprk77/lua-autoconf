@@ -5,15 +5,15 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_FILES([Makefile])
 
-AX_PATH_LUA([5.1], [],
+AX_LUA_CHECK_INTERP([5.1], [],
 	[AC_MSG_NOTICE([passed])],
 	[AC_MSG_ERROR([failed])])
 
-AX_CHECK_LUA_HEADERS(
+AX_LUA_CHECK_HEADERS(
   [AC_MSG_NOTICE([passed])],
 	[AC_MSG_ERROR([failed])])
 
-AX_CHECK_LUA_LIBS(
+AX_LUA_CHECK_LIBS(
   [AC_MSG_NOTICE([passed])],
 	[AC_MSG_ERROR([failed])])
 
