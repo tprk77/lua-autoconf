@@ -59,21 +59,21 @@
 #   --------------------------------------------------------------
 #
 #   Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
-#   as necessary. Adds precious variable LUA_INCLUDES, which may contain
-#   Lua specific include flags, e.g. -I/usr/include/lua5.1. If LUA_INCLUDES
+#   as necessary. Adds precious variable LUA_INCLUDE, which may contain
+#   Lua specific include flags, e.g. -I/usr/include/lua5.1. If LUA_INCLUDE
 #   is blank, and the headers cannot be found, then some common directories
-#   are searched. If headers are then found, then LUA_INCLUDES is set to the
-#   result.
+#   are searched. If headers are then found, then LUA_INCLUDE is set to use
+#   those headers.
 #
 #
 #   AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   -----------------------------------------------------------
 #
 #   Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
-#   macro as necessary. Adds precious variable LUA_LIBS, which may contain
-#   Lua specific linker flags, e.g. -llua5.1. If LUA_LIBS is blank, then some
-#   common flags are tested. If the link test succeeds, then LUA_INCLUDES is
-#   set to the result.
+#   macro as necessary. Adds precious variable LUA_LIB, which may contain
+#   Lua specific linker flags, e.g. -llua5.1. If LUA_LIB is blank, then some
+#   common flags are tested. If the link test then succeeds, then LUA_LIB is
+#   set to use those libs.
 #
 #
 # LICENSE
@@ -394,7 +394,7 @@ dnl =========================================================================
 dnl
 dnl Look for Lua headers. Always check if the Lua version in the headers
 dnl matches the interpreter's version. The search is performed with the
-dnl precious variable LUA_INCLUDES. If LUA_INCLUDES is blank, and the Lua
+dnl precious variable LUA_INCLUDE. If LUA_INCLUDE is blank, and the Lua
 dnl headers cannot be found, then they will be searched for in the following
 dnl locations:
 dnl
@@ -406,7 +406,7 @@ dnl   * /usr/local/include/lua/X.Y
 dnl   * /usr/local/include/luaXY
 dnl
 dnl Where X.Y is the Lua version number, e.g. 5.1. If the search is
-dnl successful, then the result is stored in LUA_INCLUDES.
+dnl successful, then the result is stored in LUA_INCLUDE.
 dnl
 dnl If the Lua headers are found, then ACTION-IF-FOUND is performed,
 dnl otherwise ACTION-IF-NOT-FOUND is pereformed instead.
@@ -424,12 +424,12 @@ AC_DEFUN([AX_LUA_CHECK_HEADERS],
       AC_MSG_ERROR([cannot check Lua headers without knowing LUA_VERSION])
     ])
 
-  dnl Make LUA_INCLUDES a precious variable.
-  AC_ARG_VAR([LUA_INCLUDES], [The Lua includes, e.g. -I/usr/include/lua5.1])
+  dnl Make LUA_INCLUDE a precious variable.
+  AC_ARG_VAR([LUA_INCLUDE], [The Lua includes, e.g. -I/usr/include/lua5.1])
 
   dnl Some default directories to search.
   LUA_SHORT_VERSION=`echo "$LUA_VERSION" | sed 's|\.||'`
-  m4_define_default([_AX_LUA_INCLUDES_LIST],
+  m4_define_default([_AX_LUA_INCLUDE_LIST],
     [ /usr/include/lua$LUA_VERSION \
       /usr/include/lua/$LUA_VERSION \
       /usr/include/lua$LUA_SHORT_VERSION \
@@ -440,15 +440,15 @@ AC_DEFUN([AX_LUA_CHECK_HEADERS],
 
   dnl Try to find the headers.
   _ax_lua_saved_cppflags=$CPPFLAGS
-  CPPFLAGS="$CPPFLAGS $LUA_INCLUDES"
+  CPPFLAGS="$CPPFLAGS $LUA_INCLUDE"
   AC_CHECK_HEADERS([lua.h lualib.h lauxlib.h luaconf.h])
   CPPFLAGS=$_ax_lua_saved_cppflags
 
-  dnl Try some other directories if LUA_INCLUDES was not set.
-  AS_IF([test "x$LUA_INCLUDES" = 'x' &&
+  dnl Try some other directories if LUA_INCLUDE was not set.
+  AS_IF([test "x$LUA_INCLUDE" = 'x' &&
          test "x$ac_cv_header_lua_h" != 'xyes'],
     [ dnl Try some common include paths.
-      for _ax_include_path in _AX_LUA_INCLUDES_LIST; do
+      for _ax_include_path in _AX_LUA_INCLUDE_LIST; do
         test ! -d "$_ax_include_path" && continue
 
         AC_MSG_CHECKING([for Lua headers in])
@@ -465,7 +465,7 @@ AC_DEFUN([AX_LUA_CHECK_HEADERS],
         CPPFLAGS=$_ax_lua_saved_cppflags
 
         AS_IF([test "x$ac_cv_header_lua_h" = 'xyes'],
-          [ LUA_INCLUDES="-I$_ax_include_path"
+          [ LUA_INCLUDE="-I$_ax_include_path"
             break
           ])
       done
@@ -478,7 +478,7 @@ AC_DEFUN([AX_LUA_CHECK_HEADERS],
       AC_CACHE_CHECK([for Lua header version],
         [ax_cv_lua_header_version],
         [ _ax_lua_saved_cppflags=$CPPFLAGS
-          CPPFLAGS="$CPPFLAGS $LUA_INCLUDES"
+          CPPFLAGS="$CPPFLAGS $LUA_INCLUDE"
           AC_RUN_IFELSE(
             [ AC_LANG_SOURCE([[
 #include <lua.h>
@@ -510,10 +510,10 @@ int main(int argc, char ** argv)
         ])
     ])
 
-  dnl Was LUA_INCLUDES specified?
+  dnl Was LUA_INCLUDE specified?
   AS_IF([test "x$ax_header_version_match" != 'xyes' &&
-         test "x$LUA_INCLUDES" != 'x'],
-    [AC_MSG_ERROR([cannot find headers for specified LUA_INCLUDES])])
+         test "x$LUA_INCLUDE" != 'x'],
+    [AC_MSG_ERROR([cannot find headers for specified LUA_INCLUDE])])
 
   dnl Test the final result and run user code.
   AS_IF([test "x$ax_header_version_match" = 'xyes'], [$1],
@@ -526,10 +526,10 @@ dnl AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 dnl
 dnl Look for Lua libaries. The search is performed with the precious variable
-dnl LUA_LIBS. If LUA_LIBS is blank, then a search is performed with the
+dnl LUA_LIB. If LUA_LIBS is blank, then a search is performed with the
 dnl following list of libraries: lua, luaX.Y, luaXY. Where X.Y is the Lua
 dnl version number, e.g. 5.1. This search also looks for libm and libdl. If
-dnl the search is successful, then the result is stored in LUA_LIBS.
+dnl the search is successful, then the result is stored in LUA_LIB.
 dnl
 dnl If the Lua libs are found, then ACTION-IF-FOUND is performed,
 dnl otherwise ACTION-IF-NOT-FOUND is pereformed instead.
@@ -547,13 +547,13 @@ AC_DEFUN([AX_LUA_CHECK_LIBS],
       AC_MSG_ERROR([cannot check Lua libs without knowing LUA_VERSION])
     ])
 
-  dnl Make LUA_LIBS a precious variable.
-  AC_ARG_VAR([LUA_LIBS], [The Lua library, e.g. -llua5.1])
+  dnl Make LUA_LIB a precious variable.
+  AC_ARG_VAR([LUA_LIB], [The Lua library, e.g. -llua5.1])
 
-  AS_IF([test "x$LUA_LIBS" != 'x'],
+  AS_IF([test "x$LUA_LIB" != 'x'],
   [ dnl Try to find the Lua libs.
     _ax_lua_saved_libs=$LIBS
-    LIBS="$LIBS $LUA_LIBS"
+    LIBS="$LIBS $LUA_LIB"
     AC_SEARCH_LIBS([lua_load], [],
       [_ax_found_lua_libs='yes'],
       [_ax_found_lua_libs='no'])
@@ -561,13 +561,13 @@ AC_DEFUN([AX_LUA_CHECK_LIBS],
 
     dnl Check the result.
     AS_IF([test "x$_ax_found_lua_libs" != 'xyes'],
-      [AC_MSG_ERROR([cannot find libs for specified LUA_LIBS])])
+      [AC_MSG_ERROR([cannot find libs for specified LUA_LIB])])
   ],
   [ dnl First search for extra libs.
     _ax_lua_extra_libs=''
 
     _ax_lua_saved_libs=$LIBS
-    LIBS="$LIBS $LUA_LIBS"
+    LIBS="$LIBS $LUA_LIB"
     AC_SEARCH_LIBS([exp], [m])
     AC_SEARCH_LIBS([dlopen], [dl])
     LIBS=$_ax_lua_saved_libs
@@ -582,7 +582,7 @@ AC_DEFUN([AX_LUA_CHECK_LIBS],
 
     dnl Try to find the Lua libs.
     _ax_lua_saved_libs=$LIBS
-    LIBS="$LIBS $LUA_LIBS"
+    LIBS="$LIBS $LUA_LIB"
     AC_SEARCH_LIBS([lua_load], [lua$LUA_VERSION lua$LUA_SHORT_VERSION lua],
       [_ax_found_lua_libs='yes'],
       [_ax_found_lua_libs='no'],
@@ -591,7 +591,7 @@ AC_DEFUN([AX_LUA_CHECK_LIBS],
 
     AS_IF([test "x$ac_cv_search_lua_load" != 'xno' &&
            test "x$ac_cv_search_lua_load" != 'xnone required'],
-      [LUA_LIBS="$ac_cv_search_lua_load $_ax_lua_extra_libs"])
+      [LUA_LIB="$ac_cv_search_lua_load $_ax_lua_extra_libs"])
   ])
 
   dnl Test the result and run user code.
