@@ -505,7 +505,7 @@ int main(int argc, char ** argv)
         [ AC_MSG_RESULT([yes])
           ax_header_version_match='yes'
         ],
-        [ AC_MSG_RESULT([yes])
+        [ AC_MSG_RESULT([no])
           ax_header_version_match='no'
         ])
     ])
