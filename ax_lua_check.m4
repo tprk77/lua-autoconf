@@ -1,5 +1,5 @@
 # ===========================================================================
-#                               ax_lua2.m4
+#                             ax_lua_check.m4
 # ===========================================================================
 #
 # SYNOPSIS
@@ -29,9 +29,17 @@
 #   Search for the Lua interpreter, and set up important Lua paths.
 #   Adds precious variable LUA, which may contain the path of the Lua
 #   interpreter. If LUA is blank, the user's path is searched for an
-#   suitable interpreter. The Lua version number LUA_VERSION if found from
-#   the interpreter, and substituted. LUA_PLATFORM is also found, but not
-#   currently supported (no standard representation).
+#   suitable interpreter.
+#
+#   If MINIMUM-VERSION is supplied, then only Lua interpreters with a version
+#   number greater or equal to MINIMUM-VERSION will be accepted. If TOO-BIG-
+#   VERSION is also supplied, then only Lua interpreters with a version
+#   number greater or equal to MINIMUM-VERSION and less than TOO-BIG-VERSION
+#   will be accepted.
+#
+#   The Lua version number, LUA_VERSION, is found from the interpreter, and
+#   substituted. LUA_PLATFORM is also found, but not currently supported (no
+#   standard representation).
 #
 #   LUA_PREFIX is set to '${prefix}', and LUA_EXEC_PREFIX is set to
 #   '${exec_prefix}'. These variables can be overwritten, but should probably
@@ -40,9 +48,9 @@
 #   Finally, the macro finds four paths:
 #
 #     luadir             Directory to install Lua scripts.
-#     pkgluadir          ${luadir}/$PACKAGE
+#     pkgluadir          $luadir/$PACKAGE
 #     luaexecdir         Directory to install Lua modules.
-#     pkgluaexecdir      ${luaexecdir}/$PACKAGE
+#     pkgluaexecdir      $luaexecdir/$PACKAGE
 #
 #   These paths a found based on $prefix, $exec_prefix, Lua's package.path,
 #   and package.cpath. The first path of package.path beginning with $prefix
@@ -54,16 +62,47 @@
 #     luadir             Default: $LUA_PREFIX/share/lua/$LUA_VERSION
 #     luaexecdir         Default: $LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION
 #
+#   These directories can be used by Automake as install destinations.
+#   The variable name minus 'dir' needs to be used as a prefix to the
+#   appropriate Automake primary, e.g. lua_SCRIPS or luaexec_LIBRARIES.
+#
+#   If an acceptable Lua interpreter is found, then ACTION-IF-FOUND is
+#   performed, otherwise ACTION-IF-NOT-FOUND is preformed. If ACTION-IF-NOT-
+#   FOUND is blank, then it will default to printing an error. To prevent
+#   the default behavior, give ':' as an action.
+#
 #
 #   AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   --------------------------------------------------------------
 #
 #   Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
 #   as necessary. Adds precious variable LUA_INCLUDE, which may contain
-#   Lua specific include flags, e.g. -I/usr/include/lua5.1. If LUA_INCLUDE
-#   is blank, and the headers cannot be found, then some common directories
-#   are searched. If headers are then found, then LUA_INCLUDE is set to use
-#   those headers.
+#   Lua specific include flags, e.g. -I/usr/include/lua5.1.
+#
+#   This macro searches for the header lua.h (and others). The search is
+#   performed with a combination of CPPFLAGS and LUA_INCLUDE. If the search
+#   is unsuccessful, then some common directories are tried. If the headers
+#   are then found, then LUA_INCLUDE is set accordingly.
+#
+#   The paths automatically searched are:
+#
+#     * /usr/include/luaX.Y
+#     * /usr/include/lua/X.Y
+#     * /usr/include/luaXY
+#     * /usr/local/include/luaX.Y
+#     * /usr/local/include/lua/X.Y
+#     * /usr/local/include/luaXY
+#
+#   (Where X.Y is the Lua version number, e.g. 5.1.)
+#
+#   The Lua version number found in the headers is always checked to match
+#   the Lua interpreter's version number. Lua headers with mismatched
+#   version numbers are not accepted.
+#
+#   If headers are found, then ACTION-IF-FOUND is performed, otherwise
+#   ACTION-IF-NOT-FOUND is performed. If ACTION-IF-NOT-FOUND is blank,
+#   then it will default to printing an error. To prevent the default
+#   behavior, set the action to ':'.
 #
 #
 #   AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
@@ -71,9 +110,19 @@
 #
 #   Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
 #   macro as necessary. Adds precious variable LUA_LIB, which may contain
-#   Lua specific linker flags, e.g. -llua5.1. If LUA_LIB is blank, then some
-#   common flags are tested. If the link test then succeeds, then LUA_LIB is
-#   set to use those libs.
+#   Lua specific linker flags, e.g. -llua5.1.
+#
+#   This macro searches for the Lua library. More technically, it searches
+#   for a library containing the function lua_load. The search is performed
+#   with a combination of LIBS, LIBRARY_PATH, and LUA_LIB.
+#
+#   If the search determines that some linker flags are missing, then those
+#   flags will be added to LUA_LIB.
+#
+#   If libraries are found, then ACTION-IF-FOUND is performed, otherwise
+#   ACTION-IF-NOT-FOUND is performed. If ACTION-IF-NOT-FOUND is blank,
+#   then it will default to printing an error. To prevent the default
+#   behavior, set the action to ':'.
 #
 #
 # LICENSE
@@ -116,33 +165,8 @@
 
 dnl =========================================================================
 dnl AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
-dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl                     [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-dnl
-dnl Adds support for distributing Lua modules and packages. To
-dnl install modules, copy them to $(luadir), using the lua_???
-dnl automake variable.  To install a package with the same name as the
-dnl automake package, install to $(pkgluadir), or use the
-dnl pkglua_??? automake variable.
-dnl
-dnl ??? would SCRIPTS work?
-dnl
-dnl The variables $(luaexecdir) and $(pkgluaexecdir) are provided as
-dnl locations to install Lua extension modules (shared libraries).
-dnl Another macro is required to find the appropriate flags to compile
-dnl extension modules.
-dnl
-dnl If your package is configured with a different prefix to Lua,
-dnl users will have to add the install directory to the LUA_PATH
-dnl environment variable.
-dnl
-dnl If the MINIMUM-VERSION argument is passed, AX_LUA_CHECK_INTERP will
-dnl cause an error if the version of Lua installed on the system
-dnl doesn't meet the requirement.  MINIMUM-VERSION should consist of
-dnl numbers and dots only. If the TOO-BIG-VERSION argument is
-dnl passed in addition to the MINIMUM-VERSION argument, then that
-dnl requirement will also be checked.
-dnl
 AC_DEFUN([AX_LUA_CHECK_INTERP],
   [_AX_LUA_CHECK_INTERP([$1], [$2], [$3], [$4])])
 
@@ -151,13 +175,12 @@ dnl =========================================================================
 dnl _AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
 dnl              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-dnl
-dnl Does the work of AX_LUA_CHECK_INTERP. This macro is used so that
-dnl requisites work as expected. This macro is an implementation detail, and
-dnl should not be used directly.
-dnl
 AC_DEFUN([_AX_LUA_CHECK_INTERP],
 [
+  dnl Does the work of AX_LUA_CHECK_INTERP. This macro is used so that
+  dnl requisites work as expected. This macro is an implementation detail,
+  dnl and should not be used directly.
+
   dnl Make LUA a precious variable.
   AC_ARG_VAR([LUA], [The Lua interpreter, e.g. /usr/bin/lua5.1])
 
@@ -234,29 +257,25 @@ AC_DEFUN([_AX_LUA_CHECK_INTERP],
     AC_SUBST([LUA_VERSION], [$ax_cv_lua_version])
     AC_SUBST([LUA_SHORT_VERSION], [`echo "$LUA_VERSION" | sed 's|\.||'`])
 
-    dnl Not supported: {{{
-    dnl At times (like when building shared libraries) you may want
-    dnl to know which OS platform Lua thinks this is.
+    dnl The following check is not supported:
+    dnl At times (like when building shared libraries) you may want to know
+    dnl which OS platform Lua thinks this is.
     AC_CACHE_CHECK([for $ax_display_LUA platform], [ax_cv_lua_platform],
       [ax_cv_lua_platform=`$LUA -e "print('unknown')"`])
     AC_SUBST([LUA_PLATFORM], [$ax_cv_lua_platform])
-    dnl }}}
 
     dnl Use the values of $prefix and $exec_prefix for the corresponding
-    dnl values of LUA_PREFIX and LUA_EXEC_PREFIX.  These are made
-    dnl distinct variables so they can be overridden if need be.  However,
-    dnl general consensus is that you shouldn't need this ability.
+    dnl values of LUA_PREFIX and LUA_EXEC_PREFIX. These are made distinct
+    dnl variables so they can be overridden if need be. However, the general
+    dnl consensus is that you shouldn't need this ability.
     AC_SUBST([LUA_PREFIX], ['${prefix}'])
     AC_SUBST([LUA_EXEC_PREFIX], ['${exec_prefix}'])
 
-    dnl Set up 4 directories:
-
-    dnl luadir -- where to install Lua scripts.
-    dnl Lua provides no way to query this directly, and instead provides
-    dnl LUAPATH.  However, we should be able to make a safe educated
-    dnl guess.  If the builtin search path contains a directory which
-    dnl is prefixed by $prefix, then we can store scripts there. The
-    dnl first matching path will be used.
+    dnl Lua provides no way to query the script directory, and instead
+    dnl provides LUA_PATH. However, we should be able to make a safe educated
+    dnl guess. If the built-in search path contains a directory which is
+    dnl prefixed by $prefix, then we can store scripts there. The first
+    dnl matching path will be used.
     AC_CACHE_CHECK([for $ax_display_LUA script directory],
       [ax_cv_lua_luadir],
       [ AS_IF([test "x$prefix" = 'xNONE'],
@@ -276,16 +295,13 @@ AC_DEFUN([_AX_LUA_CHECK_INTERP],
         ])
       ])
     AC_SUBST([luadir], [$ax_cv_lua_luadir])
-
-    dnl pkgluadir -- $PACKAGE directory under luadir.
     AC_SUBST([pkgluadir], [\${luadir}/$PACKAGE])
 
-    dnl luaexecdir -- directory for installing Lua modules.
-    dnl Lua provides no way to query this directly, and instead provides
-    dnl LUAPATH.  However, we should be able to make a safe educated
-    dnl guess.  If the builtin search path contains a directory which
-    dnl is prefixed by $prefix, then we can store modules there. The
-    dnl first matching path will be used.
+    dnl Lua provides no way to query the module directory, and instead
+    dnl provides LUA_PATH. However, we should be able to make a safe educated
+    dnl guess. If the built-in search path contains a directory which is
+    dnl prefixed by $exec_prefix, then we can store modules there. The first
+    dnl matching path will be used.
     AC_CACHE_CHECK([for $ax_display_LUA module directory],
       [ax_cv_lua_luaexecdir],
       [ AS_IF([test "x$exec_prefix" = 'xNONE'],
@@ -306,11 +322,9 @@ AC_DEFUN([_AX_LUA_CHECK_INTERP],
         ])
       ])
     AC_SUBST([luaexecdir], [$ax_cv_lua_luaexecdir])
-
-    dnl pkgluaexecdir -- $(luaexecdir)/$(PACKAGE)
     AC_SUBST([pkgluaexecdir], [\${luaexecdir}/$PACKAGE])
 
-    dnl Run any user-specified action.
+    dnl Run any user specified action.
     $3
   ])
 ])
@@ -319,11 +333,6 @@ AC_DEFUN([_AX_LUA_CHECK_INTERP],
 dnl =========================================================================
 dnl _AX_LUA_CHK_IS_INTRP(PROG, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
-dnl
-dnl Run ACTION-IF-TRUE if PROG is a Lua interpreter, or else run
-dnl ACTION-IF-FALSE otherwise. This macro is an implementation detail, and
-dnl should not be used directly.
-dnl
 AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 [
   AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" &>/dev/null],
@@ -334,11 +343,6 @@ dnl =========================================================================
 dnl _AX_LUA_CHK_VER(PROG, MINIMUM-VERSION, [TOO-BIG-VERSION],
 dnl                   [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
-dnl
-dnl Run ACTION-IF-TRUE if the Lua interpreter PROG has version >= VERSION.
-dnl Run ACTION-IF-FALSE otherwise. This macro is an implementation detail,
-dnl and should not be used directly.
-dnl
 AC_DEFUN([_AX_LUA_CHK_VER],
 [
   _ax_test_ver=`$1 -e "print(_VERSION)" 2>/dev/null | \
@@ -357,15 +361,13 @@ AC_DEFUN([_AX_LUA_CHK_VER],
 dnl =========================================================================
 dnl _AX_LUA_FND_PRFX_PTH(PROG, PREFIX, LUA-PATH-VARIABLE)
 dnl =========================================================================
-dnl
-dnl Invokes the Lua interpreter PROG to print the path variable
-dnl LUA-PATH-VARIABLE, usually package.path or package.cpath. Paths are then
-dnl matched against PREFIX. The first path to begin with PREFIX is set to
-dnl ax_lua_prefixed_path. This macro is an implementation detail, and should
-dnl not be used directly.
-dnl
 AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
 [
+  dnl Invokes the Lua interpreter PROG to print the path variable
+  dnl LUA-PATH-VARIABLE, usually package.path or package.cpath. Paths are
+  dnl then matched against PREFIX. The first path to begin with PREFIX is set
+  dnl to ax_lua_prefixed_path.
+
   ax_lua_prefixed_path=''
   _ax_package_paths=`$1 -e 'print($3)' 2>/dev/null | sed 's|;|\n|g'`
   dnl Try the paths in order, looking for the prefix.
@@ -391,26 +393,6 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
 dnl =========================================================================
 dnl AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-dnl
-dnl Look for Lua headers. Always check if the Lua version in the headers
-dnl matches the interpreter's version. The search is performed with the
-dnl precious variable LUA_INCLUDE. If LUA_INCLUDE is blank, and the Lua
-dnl headers cannot be found, then they will be searched for in the following
-dnl locations:
-dnl
-dnl   * /usr/include/luaX.Y
-dnl   * /usr/include/lua/X.Y
-dnl   * /usr/include/luaXY
-dnl   * /usr/local/include/luaX.Y
-dnl   * /usr/local/include/lua/X.Y
-dnl   * /usr/local/include/luaXY
-dnl
-dnl Where X.Y is the Lua version number, e.g. 5.1. If the search is
-dnl successful, then the result is stored in LUA_INCLUDE.
-dnl
-dnl If the Lua headers are found, then ACTION-IF-FOUND is performed,
-dnl otherwise ACTION-IF-NOT-FOUND is pereformed instead.
-dnl
 AC_DEFUN([AX_LUA_CHECK_HEADERS],
 [
   dnl Requires LUA_VERSION from AX_LUA_CHECK_INTERP.
@@ -473,7 +455,7 @@ AC_DEFUN([AX_LUA_CHECK_HEADERS],
 
   AS_IF([test "x$ac_cv_header_lua_h" = 'xyes'],
     [ dnl Make a program to print LUA_VERSION defined in the header.
-      dnl This probably shouldn't be a runtime test. Use grep CPP instead?
+      dnl TODO This probably shouldn't be a runtime test.
 
       AC_CACHE_CHECK([for Lua header version],
         [ax_cv_lua_header_version],
@@ -524,18 +506,10 @@ int main(int argc, char ** argv)
 dnl =========================================================================
 dnl AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-dnl
-dnl Look for Lua libaries. The search is performed with the precious variable
-dnl LUA_LIB. If LUA_LIBS is blank, then a search is performed with the
-dnl following list of libraries: lua, luaX.Y, luaXY. Where X.Y is the Lua
-dnl version number, e.g. 5.1. This search also looks for libm and libdl. If
-dnl the search is successful, then the result is stored in LUA_LIB.
-dnl
-dnl If the Lua libs are found, then ACTION-IF-FOUND is performed,
-dnl otherwise ACTION-IF-NOT-FOUND is pereformed instead.
-dnl
 AC_DEFUN([AX_LUA_CHECK_LIBS],
 [
+  dnl TODO Should this macro also check various -L flags?
+
   dnl Requires LUA_VERSION from AX_LUA_CHECK_INTERP.
   AC_REQUIRE([_AX_LUA_CHECK_INTERP])
 
@@ -551,7 +525,7 @@ AC_DEFUN([AX_LUA_CHECK_LIBS],
   AC_ARG_VAR([LUA_LIB], [The Lua library, e.g. -llua5.1])
 
   AS_IF([test "x$LUA_LIB" != 'x'],
-  [ dnl Try to find the Lua libs.
+  [ dnl Check that LUA_LIBS works.
     _ax_lua_saved_libs=$LIBS
     LIBS="$LIBS $LUA_LIB"
     AC_SEARCH_LIBS([lua_load], [],
