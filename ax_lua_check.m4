@@ -37,13 +37,12 @@
 #   number greater or equal to MINIMUM-VERSION and less than TOO-BIG-VERSION
 #   will be accepted.
 #
+#   Version comparisions require the AX_COMPARE_VERSION macro, which is
+#   provided by ax_compare_version.m4 from the Autoconf Archive.
+#
 #   The Lua version number, LUA_VERSION, is found from the interpreter, and
 #   substituted. LUA_PLATFORM is also found, but not currently supported (no
 #   standard representation).
-#
-#   LUA_PREFIX is set to '${prefix}', and LUA_EXEC_PREFIX is set to
-#   '${exec_prefix}'. These variables can be overwritten, but should probably
-#   be left alone. These are not precious variables.
 #
 #   Finally, the macro finds four paths:
 #
@@ -59,8 +58,8 @@
 #   Lua installations. If a path cannot be determined, a default path is
 #   used. Of course, the user can override these later when invoking make.
 #
-#     luadir             Default: $LUA_PREFIX/share/lua/$LUA_VERSION
-#     luaexecdir         Default: $LUA_EXEC_PREFIX/lib/lua/$LUA_VERSION
+#     luadir             Default: $prefix/share/lua/$LUA_VERSION
+#     luaexecdir         Default: $exec_prefix/lib/lua/$LUA_VERSION
 #
 #   These directories can be used by Automake as install destinations.
 #   The variable name minus 'dir' needs to be used as a prefix to the
@@ -80,9 +79,9 @@
 #   Lua specific include flags, e.g. -I/usr/include/lua5.1.
 #
 #   This macro searches for the header lua.h (and others). The search is
-#   performed with a combination of CPPFLAGS and LUA_INCLUDE. If the search
-#   is unsuccessful, then some common directories are tried. If the headers
-#   are then found, then LUA_INCLUDE is set accordingly.
+#   performed with a combination of CPPFLAGS, CPATH, etc, and LUA_INCLUDE.
+#   If the search is unsuccessful, then some common directories are tried. If
+#   the headers are then found, then LUA_INCLUDE is set accordingly.
 #
 #   The paths automatically searched are:
 #
