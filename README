@@ -74,9 +74,14 @@ DESCRIPTION
   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
   --------------------------------------------------------------
 
-  Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
-  as necessary. Adds precious variable LUA_INCLUDE, which may contain
-  Lua specific include flags, e.g. -I/usr/include/lua5.1.
+  Search for Lua headers. Requires that AX_PROG_LUA be expanded before this
+  macro. Adds precious variable LUA_INCLUDE, which may contain Lua specific
+  include flags, e.g. -I/usr/include/lua5.1. If LUA_INCLUDE is blank, then
+  this macro will attempt to find suitable flags.
+
+  LUA_INCLUDE can be used by Automake to compile Lua modules or executables
+  with embedded interpreters. The *_CPPFLAGS variables should be used for
+  this purpose, e.g. myprog_CPPFLAGS = $(LUA_INCLUDE).
 
   This macro searches for the header lua.h (and others). The search is
   performed with a combination of CPPFLAGS, CPATH, etc, and LUA_INCLUDE.
@@ -107,9 +112,14 @@ DESCRIPTION
   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
   -----------------------------------------------------------
 
-  Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
-  macro as necessary. Adds precious variable LUA_LIB, which may contain
-  Lua specific linker flags, e.g. -llua5.1.
+  Search for Lua libraries. Requires that AX_PROG_LUA be expanded before
+  this macro. Adds precious variable LUA_LIB, which may contain Lua specific
+  linker flags, e.g. -llua5.1. If LUA_LIB is blank, then this macro will
+  attempt to find suitable flags.
+
+  LUA_LIB can be used by Automake to link Lua modules or executables with
+  embedded interpreters. The *_LIBADD and *_LDADD variables should be used
+  for this purpose, e.g. mymod_LIBADD = $(LUA_LIB).
 
   This macro searches for the Lua library. More technically, it searches
   for a library containing the function lua_load. The search is performed
@@ -127,6 +137,7 @@ DESCRIPTION
 LICENSE
 
   Copyright (C) 2013 Tim Perkins <tprk77@gmail.com>
+  Copyright (C) 2013 Reuben Thomas <rrt@sc3d.org>
 
   This program is free software: you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
