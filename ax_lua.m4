@@ -74,9 +74,14 @@
 #   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   --------------------------------------------------------------
 #
-#   Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
-#   as necessary. Adds precious variable LUA_INCLUDE, which may contain
-#   Lua specific include flags, e.g. -I/usr/include/lua5.1.
+#   Search for Lua headers. Requires that AX_PROG_LUA be expanded before this
+#   macro. Adds precious variable LUA_INCLUDE, which may contain Lua specific
+#   include flags, e.g. -I/usr/include/lua5.1. If LUA_INCLUDE is blank, then
+#   this macro will attempt to find suitable flags.
+#
+#   LUA_INCLUDE can be used by Automake to compile Lua modules or executables
+#   with embedded interpreters. The *_CPPFLAGS variables should be used for
+#   this purpose, e.g. myprog_CPPFLAGS = $(LUA_INCLUDE).
 #
 #   This macro searches for the header lua.h (and others). The search is
 #   performed with a combination of CPPFLAGS, CPATH, etc, and LUA_INCLUDE.
@@ -107,9 +112,14 @@
 #   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   -----------------------------------------------------------
 #
-#   Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
-#   macro as necessary. Adds precious variable LUA_LIB, which may contain
-#   Lua specific linker flags, e.g. -llua5.1.
+#   Search for Lua libraries. Requires that AX_PROG_LUA be expanded before
+#   this macro. Adds precious variable LUA_LIB, which may contain Lua specific
+#   linker flags, e.g. -llua5.1. If LUA_LIB is blank, then this macro will
+#   attempt to find suitable flags.
+#
+#   LUA_LIB can be used by Automake to link Lua modules or executables with
+#   embedded interpreters. The *_LIBADD and *_LDADD variables should be used
+#   for this purpose, e.g. mymod_LIBADD = $(LUA_LIB).
 #
 #   This macro searches for the Lua library. More technically, it searches
 #   for a library containing the function lua_load. The search is performed
@@ -167,20 +177,6 @@ dnl AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
 dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 AC_DEFUN([AX_PROG_LUA], [_AX_PROG_LUA($@)])
-
-dnl AX_WITH_LUA is now the same thing as AX_PROG_LUA.
-AC_DEFUN([AX_WITH_LUA],
-[
-  AC_MSG_WARN([[$0 is deprecated, please use AX_PROG_LUA]])
-  _AX_PROG_LUA($@)
-])
-
-
-dnl =========================================================================
-dnl _AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-dnl              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-dnl =========================================================================
-AC_DEFUN([_AX_PROG_LUA],
 [
   dnl Does the work of AX_PROG_LUA. This macro is used so that
   dnl requisites work as expected. This macro is an implementation detail,
@@ -334,6 +330,13 @@ AC_DEFUN([_AX_PROG_LUA],
   ])
 ])
 
+dnl AX_WITH_LUA is now the same thing as AX_PROG_LUA.
+AC_DEFUN([AX_WITH_LUA],
+[
+  AC_MSG_WARN([[$0 is deprecated, please use AX_PROG_LUA]])
+  AX_PROG_LUA($@)
+])
+
 
 dnl =========================================================================
 dnl _AX_LUA_CHK_IS_INTRP(PROG, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
@@ -343,6 +346,7 @@ AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
   AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" &>/dev/null],
     [$2], [$3])
 ])
+
 
 dnl =========================================================================
 dnl _AX_LUA_CHK_VER(PROG, MINIMUM-VERSION, [TOO-BIG-VERSION],
@@ -400,9 +404,6 @@ dnl AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 AC_DEFUN([AX_LUA_HEADERS],
 [
-  dnl Requires LUA_VERSION from AX_PROG_LUA.
-  AC_REQUIRE([_AX_PROG_LUA])
-
   dnl Check for LUA_VERSION.
   AC_MSG_CHECKING([if LUA_VERSION is defined])
   AS_IF([test "x$LUA_VERSION" != 'x'],
@@ -521,9 +522,6 @@ AC_DEFUN([AX_LUA_LIBS],
 [
   dnl TODO Should this macro also check various -L flags?
 
-  dnl Requires LUA_VERSION from AX_PROG_LUA.
-  AC_REQUIRE([_AX_PROG_LUA])
-
   dnl Check for LUA_VERSION.
   AC_MSG_CHECKING([if LUA_VERSION is defined])
   AS_IF([test "x$LUA_VERSION" != 'x'],
@@ -583,3 +581,5 @@ AC_DEFUN([AX_LUA_LIBS],
   AS_IF([test "x$_ax_found_lua_libs" = 'xyes'], [$1],
     [m4_default([$2], [AC_MSG_ERROR([cannot find Lua libs])])])
 ])
+
+
