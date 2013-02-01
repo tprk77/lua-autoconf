@@ -6,16 +6,16 @@ LT_INIT
 
 AC_CONFIG_FILES([Makefile])
 
-AX_LUA_CHECK_INTERP([], [],
-	[AC_MSG_NOTICE([passed])],
-	[AC_MSG_ERROR([failed])])
-
-AX_LUA_CHECK_HEADERS(
+AX_PROG_LUA([], [],
   [AC_MSG_NOTICE([passed])],
-	[AC_MSG_ERROR([failed])])
+  [AC_MSG_ERROR([failed])])
 
-AX_LUA_CHECK_LIBS(
+AX_LUA_HEADERS(
   [AC_MSG_NOTICE([passed])],
-	[AC_MSG_ERROR([failed])])
+  [AC_MSG_ERROR([failed])])
+
+AX_LUA_LIBS(
+  [AC_MSG_NOTICE([passed])],
+  [AC_MSG_ERROR([failed])])
 
 AC_OUTPUT

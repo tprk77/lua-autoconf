@@ -1,13 +1,13 @@
 # ===========================================================================
-#                             ax_lua_check.m4
+#                               ax_lua.m4
 # ===========================================================================
 #
 # SYNOPSIS
 #
-#   AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
-#                       [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
+#               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #
 # DESCRIPTION
 #
@@ -22,8 +22,8 @@
 #   side-by-side).
 #
 #
-#   AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
-#                       [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
+#               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   -------------------------------------------------------------
 #
 #   Search for the Lua interpreter, and set up important Lua paths.
@@ -71,7 +71,7 @@
 #   the default behavior, give ':' as an action.
 #
 #
-#   AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   --------------------------------------------------------------
 #
 #   Search for Lua headers. Requires AX_LUA_PATH, and will expand that macro
@@ -104,7 +104,7 @@
 #   behavior, set the action to ':'.
 #
 #
-#   AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   -----------------------------------------------------------
 #
 #   Search for Lua libraries. Requires AX_LUA_PATH, and will expand that
@@ -163,20 +163,26 @@
 
 
 dnl =========================================================================
-dnl AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
-dnl                     [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
+dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-AC_DEFUN([AX_LUA_CHECK_INTERP],
-  [_AX_LUA_CHECK_INTERP([$1], [$2], [$3], [$4])])
+AC_DEFUN([AX_PROG_LUA], [_AX_PROG_LUA($@)])
+
+dnl AX_WITH_LUA is now the same thing as AX_PROG_LUA.
+AC_DEFUN([AX_WITH_LUA],
+[
+  AC_MSG_WARN([[$0 is deprecated, please use AX_PROG_LUA]])
+  _AX_PROG_LUA($@)
+])
 
 
 dnl =========================================================================
-dnl _AX_LUA_CHECK_INTERP([MINIMUM-VERSION], [TOO-BIG-VERSION],
+dnl _AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
 dnl              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-AC_DEFUN([_AX_LUA_CHECK_INTERP],
+AC_DEFUN([_AX_PROG_LUA],
 [
-  dnl Does the work of AX_LUA_CHECK_INTERP. This macro is used so that
+  dnl Does the work of AX_PROG_LUA. This macro is used so that
   dnl requisites work as expected. This macro is an implementation detail,
   dnl and should not be used directly.
 
@@ -340,7 +346,7 @@ AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 
 dnl =========================================================================
 dnl _AX_LUA_CHK_VER(PROG, MINIMUM-VERSION, [TOO-BIG-VERSION],
-dnl                   [ACTION-IF-TRUE], [ACTION-IF-FALSE])
+dnl                 [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_VER],
 [
@@ -390,12 +396,12 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
 
 
 dnl =========================================================================
-dnl AX_LUA_CHECK_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-AC_DEFUN([AX_LUA_CHECK_HEADERS],
+AC_DEFUN([AX_LUA_HEADERS],
 [
-  dnl Requires LUA_VERSION from AX_LUA_CHECK_INTERP.
-  AC_REQUIRE([_AX_LUA_CHECK_INTERP])
+  dnl Requires LUA_VERSION from AX_PROG_LUA.
+  AC_REQUIRE([_AX_PROG_LUA])
 
   dnl Check for LUA_VERSION.
   AC_MSG_CHECKING([if LUA_VERSION is defined])
@@ -501,16 +507,22 @@ int main(int argc, char ** argv)
     [m4_default([$2], [AC_MSG_ERROR([cannot find Lua includes])])])
 ])
 
+dnl AX_LUA_HEADERS_VERSION no longer exists, use AX_LUA_HEADERS.
+AC_DEFUN([AX_LUA_HEADERS_VERSION],
+[
+  AC_MSG_WARN([[$0 is deprecated, please use AX_LUA_HEADERS]])
+])
+
 
 dnl =========================================================================
-dnl AX_LUA_CHECK_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-AC_DEFUN([AX_LUA_CHECK_LIBS],
+AC_DEFUN([AX_LUA_LIBS],
 [
   dnl TODO Should this macro also check various -L flags?
 
-  dnl Requires LUA_VERSION from AX_LUA_CHECK_INTERP.
-  AC_REQUIRE([_AX_LUA_CHECK_INTERP])
+  dnl Requires LUA_VERSION from AX_PROG_LUA.
+  AC_REQUIRE([_AX_PROG_LUA])
 
   dnl Check for LUA_VERSION.
   AC_MSG_CHECKING([if LUA_VERSION is defined])

@@ -4,7 +4,7 @@ function enter_dir {
 	echo "[ENTERING $1]"
 	cd $1
 	if [ ! -d m4 ]; then mkdir m4; fi
-	cp ../../ax_lua_check.m4 ./m4/ax_lua_check.m4
+	cp ../../ax_lua.m4 ./m4/ax_lua.m4
 	cp ../ax_compare_version.m4 ./m4/ax_compare_version.m4
 	autoreconf -i
 }
