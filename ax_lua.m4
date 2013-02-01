@@ -172,6 +172,8 @@
 #   17). Basically, this file is a mashup of those two files. I like to think
 #   it combines the best of the two!
 
+#serial 18
+
 
 dnl =========================================================================
 dnl AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
