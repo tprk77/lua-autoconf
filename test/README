@@ -1,0 +1,23 @@
+These tests are not meant to be comprehensive or fully automated. They
+provide a quick sanity check of several use cases. The following
+directories are provided for the following tests:
+
+  * noreq       Test a build with no requirements on the Lua version.
+  * minreq      Test a build which requires a minimum version (5.1).
+  * minmaxreq   Test a build which requires a version range (>= 5.1, < 5.2).
+
+For each type of test, the following interpreters are tried:
+
+  * lua50
+  * lua5.1
+  * lua5.2
+  * badinterp (Not actually a Lua interpreter)
+
+The test assumes that all of these Luas are installed (interpreter, headers,
+and libs). The exception is badinterp, which is not actually a Lua
+interpreter, and is expected to fail. If they are not installed, the test
+will print some FAILs which can be safely ignored.
+
+The tests will also attempt to build some small example projects. They will
+build a Lua module, and an executable with Lua embedded. See the tests for
+more details.
