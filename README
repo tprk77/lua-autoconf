@@ -8,6 +8,7 @@ SYNOPSIS
               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 
 DESCRIPTION
 
@@ -22,9 +23,29 @@ DESCRIPTION
   side-by-side).
 
 
+  *** A note on compatibility with previous versions: This file has been
+  mostly rewritten for serial 18. Most developers should be able to use
+  these macros without needing to modify configure.ac. Care has been taken
+  to preserve each macro's behaviour, but there are some differences:
+
+  1) AX_WITH_LUA is deprecated; it now expands to the exact same thing as
+  AX_PROG_LUA with no arguments.
+
+  2) AX_LUA_HEADERS now checks that the version number defined in lua.h
+  matches the interpreter version. AX_LUA_HEADERS_VERSION is therefore
+  unnecessary, so it is deprecated and does not expand to anything.
+
+  3) The configure flag --with-lua-suffix no longer exists; the user
+  should instead specify the LUA precious variable on the command line.
+  See the AX_PROG_LUA description for details.
+
+  Please read the macro descriptions for more information. ***
+
+
+
   AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  -------------------------------------------------------------
+  -----------------------------------------------------
 
   Search for the Lua interpreter, and set up important Lua paths.
   Adds precious variable LUA, which may contain the path of the Lua
@@ -72,7 +93,7 @@ DESCRIPTION
 
 
   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  --------------------------------------------------------------
+  --------------------------------------------------------
 
   Search for Lua headers. Requires that AX_PROG_LUA be expanded before this
   macro. Adds precious variable LUA_INCLUDE, which may contain Lua specific
@@ -110,7 +131,7 @@ DESCRIPTION
 
 
   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  -----------------------------------------------------------
+  -----------------------------------------------------
 
   Search for Lua libraries. Requires that AX_PROG_LUA be expanded before
   this macro. Adds precious variable LUA_LIB, which may contain Lua specific
@@ -132,6 +153,16 @@ DESCRIPTION
   ACTION-IF-NOT-FOUND is performed. If ACTION-IF-NOT-FOUND is blank,
   then it will default to printing an error. To prevent the default
   behavior, set the action to ':'.
+
+
+  AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  ---------------------------------------------------------
+
+  Search for readline headers and libraries. Requires the AX_LIB_READLINE
+  macro, which is provided by ax_lib_readline.m4 from the Autoconf Archive.
+
+  If a readline compatible library is found, then ACTION-IF-FOUND is
+  performed, otherwise ACTION-IF-NOT-FOUND is performed.
 
 
 LICENSE
@@ -167,7 +198,3 @@ LICENSE
 
 THANKS
 
-  This file was inspired by Andrew Dalke's and James Henstridge's python.m4
-  and Tom Payne's, Matthieu Moy's, and Reuben Thomas's ax_lua.m4 (serial
-  17). Basically, this file is a mashup of those two files. I like to think
-  it combines the best of the two!
