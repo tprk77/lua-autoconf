@@ -22,9 +22,29 @@
 #   side-by-side).
 #
 #
+#   *** A note on compatibility with previous versions: This file has been
+#   mostly rewritten for serial 18. Most developers should be able to use
+#   these macros without needing to modify configure.ac. Care has been taken
+#   to preserve each macro's behaviour, but there are some differences:
+#
+#   1) AX_WITH_LUA is deprecated; it now expands to the exact same thing as
+#   AX_PROG_LUA with no arguments.
+#
+#   2) AX_LUA_HEADERS now checks that the version number defined in lua.h
+#   matches the interpreter version. AX_LUA_HEADERS_VERSION is therefore
+#   unnecessary, so it is deprecated and does not expand to anything.
+#
+#   3) The configure flag --with-lua-suffix no longer exists; the user
+#   should instead specify the LUA precious variable on the command line.
+#   See the AX_PROG_LUA description for details.
+#
+#   Please read the macro descriptions for more information. ***
+#
+#
+#
 #   AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
 #               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   -------------------------------------------------------------
+#   -----------------------------------------------------
 #
 #   Search for the Lua interpreter, and set up important Lua paths.
 #   Adds precious variable LUA, which may contain the path of the Lua
@@ -72,7 +92,7 @@
 #
 #
 #   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   --------------------------------------------------------------
+#   --------------------------------------------------------
 #
 #   Search for Lua headers. Requires that AX_PROG_LUA be expanded before this
 #   macro. Adds precious variable LUA_INCLUDE, which may contain Lua specific
@@ -110,7 +130,7 @@
 #
 #
 #   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   -----------------------------------------------------------
+#   -----------------------------------------------------
 #
 #   Search for Lua libraries. Requires that AX_PROG_LUA be expanded before
 #   this macro. Adds precious variable LUA_LIB, which may contain Lua specific
@@ -337,7 +357,7 @@ dnl AX_WITH_LUA is now the same thing as AX_PROG_LUA.
 AC_DEFUN([AX_WITH_LUA],
 [
   AC_MSG_WARN([[$0 is deprecated, please use AX_PROG_LUA]])
-  AX_PROG_LUA($@)
+  AX_PROG_LUA
 ])
 
 
