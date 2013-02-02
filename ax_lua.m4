@@ -8,6 +8,7 @@
 #               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 #
 # DESCRIPTION
 #
@@ -152,6 +153,16 @@
 #   ACTION-IF-NOT-FOUND is performed. If ACTION-IF-NOT-FOUND is blank,
 #   then it will default to printing an error. To prevent the default
 #   behavior, set the action to ':'.
+#
+#
+#   AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   ---------------------------------------------------------
+#
+#   Search for readline headers and libraries. Requires the AX_LIB_READLINE
+#   macro, which is provided by ax_lib_readline.m4 from the Autoconf Archive.
+#
+#   If a readline compatible library is found, then ACTION-IF-FOUND is
+#   performed, otherwise ACTION-IF-NOT-FOUND is performed.
 #
 #
 # LICENSE
@@ -606,3 +617,16 @@ AC_DEFUN([AX_LUA_LIBS],
 ])
 
 
+dnl =========================================================================
+dnl AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl =========================================================================
+AC_DEFUN([AX_LUA_READLINE],
+[
+  AX_LIB_READLINE
+  AS_IF([test "x$ac_cv_header_readline_readline_h" != 'x' &&
+         test "x$ac_cv_header_readline_history_h" != 'x'],
+    [ LUA_LIBS_CFLAGS="-DLUA_USE_READLINE $LUA_LIBS_CFLAGS"
+      $1
+    ],
+    [$2])
+])
