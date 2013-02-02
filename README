@@ -198,3 +198,7 @@ LICENSE
 
 THANKS
 
+  This file was inspired by Andrew Dalke's and James Henstridge's python.m4
+  and Tom Payne's, Matthieu Moy's, and Reuben Thomas's ax_lua.m4 (serial
+  17). Basically, this file is a mashup of those two files. I like to think
+  it combines the best of the two!
