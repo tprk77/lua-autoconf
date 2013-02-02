@@ -210,7 +210,7 @@ dnl =========================================================================
 dnl AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
 dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
-AC_DEFUN([AX_PROG_LUA], [_AX_PROG_LUA($@)])
+AC_DEFUN([AX_PROG_LUA],
 [
   dnl Does the work of AX_PROG_LUA. This macro is used so that
   dnl requisites work as expected. This macro is an implementation detail,
