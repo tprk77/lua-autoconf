@@ -618,7 +618,7 @@ AC_DEFUN([AX_LUA_LIBS],
 
 
 dnl =========================================================================
-dnl AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+dnl AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 AC_DEFUN([AX_LUA_READLINE],
 [
