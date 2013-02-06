@@ -4,11 +4,11 @@
 #
 # SYNOPSIS
 #
-#   AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-#               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+#   AX_PROG_LUA[([MINIMUM-VERSION], [TOO-BIG-VERSION],
+#                [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   AX_LUA_HEADERS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   AX_LUA_LIBS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   AX_LUA_READLINE[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
 #
 # DESCRIPTION
 #
@@ -43,9 +43,9 @@
 #
 #
 #
-#   AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-#               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   -----------------------------------------------------
+#   AX_PROG_LUA[([MINIMUM-VERSION], [TOO-BIG-VERSION],
+#                [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   -------------------------------------------------------
 #
 #   Search for the Lua interpreter, and set up important Lua paths.
 #   Adds precious variable LUA, which may contain the path of the Lua
@@ -92,8 +92,8 @@
 #   the default behavior, give ':' as an action.
 #
 #
-#   AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   --------------------------------------------------------
+#   AX_LUA_HEADERS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   ----------------------------------------------------------
 #
 #   Search for Lua headers. Requires that AX_PROG_LUA be expanded before this
 #   macro. Adds precious variable LUA_INCLUDE, which may contain Lua specific
@@ -130,8 +130,8 @@
 #   behavior, set the action to ':'.
 #
 #
-#   AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   -----------------------------------------------------
+#   AX_LUA_LIBS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   -------------------------------------------------------
 #
 #   Search for Lua libraries. Requires that AX_PROG_LUA be expanded before
 #   this macro. Adds precious variable LUA_LIB, which may contain Lua specific
@@ -155,8 +155,8 @@
 #   behavior, set the action to ':'.
 #
 #
-#   AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-#   ---------------------------------------------------------
+#   AX_LUA_READLINE[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+#   -----------------------------------------------------------
 #
 #   Search for readline headers and libraries. Requires the AX_LIB_READLINE
 #   macro, which is provided by ax_lib_readline.m4 from the Autoconf Archive.
@@ -212,10 +212,6 @@ dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 AC_DEFUN([AX_PROG_LUA],
 [
-  dnl Does the work of AX_PROG_LUA. This macro is used so that
-  dnl requisites work as expected. This macro is an implementation detail,
-  dnl and should not be used directly.
-
   dnl Make LUA a precious variable.
   AC_ARG_VAR([LUA], [The Lua interpreter, e.g. /usr/bin/lua5.1])
 
@@ -377,6 +373,7 @@ dnl _AX_LUA_CHK_IS_INTRP(PROG, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 [
+  dnl Just print _VERSION because all Lua interpreters have this global.
   AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" &>/dev/null],
     [$2], [$3])
 ])
