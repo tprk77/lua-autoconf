@@ -4,11 +4,11 @@
 
 SYNOPSIS
 
-  AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+  AX_PROG_LUA[([MINIMUM-VERSION], [TOO-BIG-VERSION],
+               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  AX_LUA_HEADERS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  AX_LUA_LIBS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  AX_LUA_READLINE[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
 
 DESCRIPTION
 
@@ -43,9 +43,9 @@ DESCRIPTION
 
 
 
-  AX_PROG_LUA([MINIMUM-VERSION], [TOO-BIG-VERSION],
-              [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  -----------------------------------------------------
+  AX_PROG_LUA[([MINIMUM-VERSION], [TOO-BIG-VERSION],
+               [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  -------------------------------------------------------
 
   Search for the Lua interpreter, and set up important Lua paths.
   Adds precious variable LUA, which may contain the path of the Lua
@@ -92,8 +92,8 @@ DESCRIPTION
   the default behavior, give ':' as an action.
 
 
-  AX_LUA_HEADERS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  --------------------------------------------------------
+  AX_LUA_HEADERS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  ----------------------------------------------------------
 
   Search for Lua headers. Requires that AX_PROG_LUA be expanded before this
   macro. Adds precious variable LUA_INCLUDE, which may contain Lua specific
@@ -130,8 +130,8 @@ DESCRIPTION
   behavior, set the action to ':'.
 
 
-  AX_LUA_LIBS([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  -----------------------------------------------------
+  AX_LUA_LIBS[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  -------------------------------------------------------
 
   Search for Lua libraries. Requires that AX_PROG_LUA be expanded before
   this macro. Adds precious variable LUA_LIB, which may contain Lua specific
@@ -155,8 +155,8 @@ DESCRIPTION
   behavior, set the action to ':'.
 
 
-  AX_LUA_READLINE([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
-  ---------------------------------------------------------
+  AX_LUA_READLINE[([ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])]
+  -----------------------------------------------------------
 
   Search for readline headers and libraries. Requires the AX_LIB_READLINE
   macro, which is provided by ax_lib_readline.m4 from the Autoconf Archive.
