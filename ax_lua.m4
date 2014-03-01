@@ -215,6 +215,11 @@ dnl             [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 dnl =========================================================================
 AC_DEFUN([AX_PROG_LUA],
 [
+  dnl Check for required tools.
+  AC_REQUIRE([AC_PROG_GREP])
+  AC_REQUIRE([AC_PROG_SED])
+  AC_REQUIRE([AC_PROG_EGREP])
+
   dnl Make LUA a precious variable.
   AC_ARG_VAR([LUA], [The Lua interpreter, e.g. /usr/bin/lua5.1])
 
@@ -283,13 +288,13 @@ AC_DEFUN([AX_PROG_LUA],
   [ dnl Query Lua for its version number.
     AC_CACHE_CHECK([for $ax_display_LUA version], [ax_cv_lua_version],
       [ ax_cv_lua_version=`$LUA -e "print(_VERSION)" | \
-          sed "s|^Lua \(.*\)|\1|" | \
-          grep -E -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
+          $SED "s|^Lua \(.*\)|\1|" | \
+          $EGREP -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
       ])
     AS_IF([test "x$ax_cv_lua_version" = 'x'],
       [AC_MSG_ERROR([invalid Lua version number])])
     AC_SUBST([LUA_VERSION], [$ax_cv_lua_version])
-    AC_SUBST([LUA_SHORT_VERSION], [`echo "$LUA_VERSION" | sed 's|\.||'`])
+    AC_SUBST([LUA_SHORT_VERSION], [`echo "$LUA_VERSION" | $SED 's|\.||'`])
 
     dnl The following check is not supported:
     dnl At times (like when building shared libraries) you may want to know
@@ -323,9 +328,9 @@ AC_DEFUN([AX_PROG_LUA],
         _AX_LUA_FND_PRFX_PTH([$LUA], [$ax_lua_prefix], [package.path])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
-          _ax_strip_prefix=`echo "$ax_lua_prefix" | sed 's|.|.|g'`
+          _ax_strip_prefix=`echo "$ax_lua_prefix" | $SED 's|.|.|g'`
           ax_cv_lua_luadir=`echo "$ax_lua_prefixed_path" | \
-            sed "s,^$_ax_strip_prefix,$LUA_PREFIX,"`
+            $SED "s,^$_ax_strip_prefix,$LUA_PREFIX,"`
         ])
       ])
     AC_SUBST([luadir], [$ax_cv_lua_luadir])
@@ -350,9 +355,9 @@ AC_DEFUN([AX_PROG_LUA],
           [$ax_lua_exec_prefix], [package.cpathd])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
-          _ax_strip_prefix=`echo "$ax_lua_exec_prefix" | sed 's|.|.|g'`
+          _ax_strip_prefix=`echo "$ax_lua_exec_prefix" | $SED 's|.|.|g'`
           ax_cv_lua_luaexecdir=`echo "$ax_lua_prefixed_path" | \
-            sed "s,^$_ax_strip_prefix,$LUA_EXEC_PREFIX,"`
+            $SED "s,^$_ax_strip_prefix,$LUA_EXEC_PREFIX,"`
         ])
       ])
     AC_SUBST([luaexecdir], [$ax_cv_lua_luaexecdir])
@@ -389,7 +394,7 @@ dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_VER],
 [
   _ax_test_ver=`$1 -e "print(_VERSION)" 2>/dev/null | \
-    sed "s|^Lua \(.*\)|\1|" | grep -E -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
+    $SED "s|^Lua \(.*\)|\1|" | $EGREP -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
   AS_IF([test "x$_ax_test_ver" = 'x'],
     [_ax_test_ver='0'])
   AX_COMPARE_VERSION([$_ax_test_ver], [ge], [$2])
@@ -412,19 +417,19 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
   dnl to ax_lua_prefixed_path.
 
   ax_lua_prefixed_path=''
-  _ax_package_paths=`$1 -e 'print($3)' 2>/dev/null | sed 's|;|\n|g'`
+  _ax_package_paths=`$1 -e 'print($3)' 2>/dev/null | $SED 's|;|\n|g'`
   dnl Try the paths in order, looking for the prefix.
   for _ax_package_path in $_ax_package_paths; do
     dnl Copy the path, up to the use of a Lua wildcard.
-    _ax_path_parts=`echo "$_ax_package_path" | sed 's|/|\n|g'`
+    _ax_path_parts=`echo "$_ax_package_path" | $SED 's|/|\n|g'`
     _ax_reassembled=''
     for _ax_path_part in $_ax_path_parts; do
-      echo "$_ax_path_part" | grep '\?' >/dev/null && break
+      echo "$_ax_path_part" | $GREP '\?' >/dev/null && break
       _ax_reassembled="$_ax_reassembled/$_ax_path_part"
     done
     dnl Check the path against the prefix.
     _ax_package_path=$_ax_reassembled
-    if echo "$_ax_package_path" | grep "^$2" >/dev/null; then
+    if echo "$_ax_package_path" | $GREP "^$2" >/dev/null; then
       dnl Found it.
       ax_lua_prefixed_path=$_ax_package_path
       break
@@ -450,7 +455,7 @@ AC_DEFUN([AX_LUA_HEADERS],
   AC_ARG_VAR([LUA_INCLUDE], [The Lua includes, e.g. -I/usr/include/lua5.1])
 
   dnl Some default directories to search.
-  LUA_SHORT_VERSION=`echo "$LUA_VERSION" | sed 's|\.||'`
+  LUA_SHORT_VERSION=`echo "$LUA_VERSION" | $SED 's|\.||'`
   m4_define_default([_AX_LUA_INCLUDE_LIST],
     [ /usr/include/lua$LUA_VERSION \
       /usr/include/lua-$LUA_VERSION \
@@ -516,8 +521,8 @@ int main(int argc, char ** argv)
 ]])
             ],
             [ ax_cv_lua_header_version=`./conftest$EXEEXT p | \
-                sed "s|^Lua \(.*\)|\1|" | \
-                grep -E -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
+                $SED "s|^Lua \(.*\)|\1|" | \
+                $EGREP -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
             ],
             [ax_cv_lua_header_version='unknown'])
           CPPFLAGS=$_ax_lua_saved_cppflags
