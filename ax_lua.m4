@@ -112,9 +112,11 @@
 #   The paths automatically searched are:
 #
 #     * /usr/include/luaX.Y
+#     * /usr/include/lua-X.Y
 #     * /usr/include/lua/X.Y
 #     * /usr/include/luaXY
 #     * /usr/local/include/luaX.Y
+#     * /usr/local/include/lua-X.Y
 #     * /usr/local/include/lua/X.Y
 #     * /usr/local/include/luaXY
 #
@@ -201,7 +203,8 @@
 #   This file was inspired by Andrew Dalke's and James Henstridge's python.m4
 #   and Tom Payne's, Matthieu Moy's, and Reuben Thomas's ax_lua.m4 (serial
 #   17). Basically, this file is a mash-up of those two files. I like to
-#   think it combines the best of the two!
+#   think it combines the best of the two! Also thanks to Dmitrij Czarkoff
+#   for bugs and OpenBSD help.
 
 #serial 0 (See the Autoconf Archive for an official release.)
 
@@ -450,9 +453,11 @@ AC_DEFUN([AX_LUA_HEADERS],
   LUA_SHORT_VERSION=`echo "$LUA_VERSION" | sed 's|\.||'`
   m4_define_default([_AX_LUA_INCLUDE_LIST],
     [ /usr/include/lua$LUA_VERSION \
+      /usr/include/lua-$LUA_VERSION \
       /usr/include/lua/$LUA_VERSION \
       /usr/include/lua$LUA_SHORT_VERSION \
       /usr/local/include/lua$LUA_VERSION \
+      /usr/local/include/lua-$LUA_VERSION \
       /usr/local/include/lua/$LUA_VERSION \
       /usr/local/include/lua$LUA_SHORT_VERSION \
     ])
