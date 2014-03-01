@@ -203,7 +203,7 @@
 #   17). Basically, this file is a mash-up of those two files. I like to
 #   think it combines the best of the two!
 
-#serial 19
+#serial 0 (See the Autoconf Archive for an official release.)
 
 
 dnl =========================================================================
