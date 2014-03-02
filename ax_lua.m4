@@ -204,7 +204,7 @@
 #   and Tom Payne's, Matthieu Moy's, and Reuben Thomas's ax_lua.m4 (serial
 #   17). Basically, this file is a mash-up of those two files. I like to
 #   think it combines the best of the two! Also thanks to Dmitrij Czarkoff
-#   for bugs and OpenBSD help.
+#   and Li-Wen Hsu for bugs and OpenBSD help.
 
 #serial 0 (See the Autoconf Archive for an official release.)
 
@@ -224,7 +224,7 @@ AC_DEFUN([AX_PROG_LUA],
 
   dnl Find a Lua interpreter.
   m4_define_default([_AX_LUA_INTERPRETER_LIST],
-    [lua lua5.2 lua5.1 lua50])
+    [lua lua5.2 lua52 lua5.1 lua51 lua50])
 
   m4_if([$1], [],
   [ dnl No version check is needed. Find any Lua interpreter.
@@ -604,7 +604,13 @@ AC_DEFUN([AX_LUA_LIBS],
     dnl Try to find the Lua libs.
     _ax_lua_saved_libs=$LIBS
     LIBS="$LIBS $LUA_LIB"
-    AC_SEARCH_LIBS([lua_load], [lua$LUA_VERSION lua$LUA_SHORT_VERSION lua],
+    AC_SEARCH_LIBS([lua_load],
+      [ lua$LUA_VERSION \
+        lua$LUA_SHORT_VERSION \
+        lua-$LUA_VERSION \
+        lua-$LUA_SHORT_VERSION \
+        lua \
+      ],
       [_ax_found_lua_libs='yes'],
       [_ax_found_lua_libs='no'],
       [$_ax_lua_extra_libs])
