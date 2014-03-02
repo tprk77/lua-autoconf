@@ -218,7 +218,6 @@ AC_DEFUN([AX_PROG_LUA],
   dnl Check for required tools.
   AC_REQUIRE([AC_PROG_GREP])
   AC_REQUIRE([AC_PROG_SED])
-  AC_REQUIRE([AC_PROG_EGREP])
 
   dnl Make LUA a precious variable.
   AC_ARG_VAR([LUA], [The Lua interpreter, e.g. /usr/bin/lua5.1])
@@ -288,8 +287,7 @@ AC_DEFUN([AX_PROG_LUA],
   [ dnl Query Lua for its version number.
     AC_CACHE_CHECK([for $ax_display_LUA version], [ax_cv_lua_version],
       [ ax_cv_lua_version=`$LUA -e "print(_VERSION)" | \
-          $SED "s|^Lua \(.*\)|\1|" | \
-          $EGREP -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
+          $SED -n "s|^Lua \(@<:@0-9@:>@\{1,\}\.@<:@0-9@:>@\{1,\}\).\{0,\}|\1|p"`
       ])
     AS_IF([test "x$ax_cv_lua_version" = 'x'],
       [AC_MSG_ERROR([invalid Lua version number])])
@@ -330,7 +328,7 @@ AC_DEFUN([AX_PROG_LUA],
         [ dnl Fix the prefix.
           _ax_strip_prefix=`echo "$ax_lua_prefix" | $SED 's|.|.|g'`
           ax_cv_lua_luadir=`echo "$ax_lua_prefixed_path" | \
-            $SED "s,^$_ax_strip_prefix,$LUA_PREFIX,"`
+            $SED "s|^$_ax_strip_prefix|$LUA_PREFIX|"`
         ])
       ])
     AC_SUBST([luadir], [$ax_cv_lua_luadir])
@@ -357,7 +355,7 @@ AC_DEFUN([AX_PROG_LUA],
         [ dnl Fix the prefix.
           _ax_strip_prefix=`echo "$ax_lua_exec_prefix" | $SED 's|.|.|g'`
           ax_cv_lua_luaexecdir=`echo "$ax_lua_prefixed_path" | \
-            $SED "s,^$_ax_strip_prefix,$LUA_EXEC_PREFIX,"`
+            $SED "s|^$_ax_strip_prefix|$LUA_EXEC_PREFIX|"`
         ])
       ])
     AC_SUBST([luaexecdir], [$ax_cv_lua_luaexecdir])
@@ -394,7 +392,7 @@ dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_VER],
 [
   _ax_test_ver=`$1 -e "print(_VERSION)" 2>/dev/null | \
-    $SED "s|^Lua \(.*\)|\1|" | $EGREP -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
+    $SED -n "s|^Lua \(@<:@0-9@:>@\{1,\}\.@<:@0-9@:>@\{1,\}\).\{0,\}|\1|p"`
   AS_IF([test "x$_ax_test_ver" = 'x'],
     [_ax_test_ver='0'])
   AX_COMPARE_VERSION([$_ax_test_ver], [ge], [$2])
@@ -424,7 +422,7 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
     _ax_path_parts=`echo "$_ax_package_path" | $SED 's|/|\n|g'`
     _ax_reassembled=''
     for _ax_path_part in $_ax_path_parts; do
-      echo "$_ax_path_part" | $GREP '\?' >/dev/null && break
+      echo "$_ax_path_part" | $GREP '?' >/dev/null && break
       _ax_reassembled="$_ax_reassembled/$_ax_path_part"
     done
     dnl Check the path against the prefix.
@@ -521,8 +519,7 @@ int main(int argc, char ** argv)
 ]])
             ],
             [ ax_cv_lua_header_version=`./conftest$EXEEXT p | \
-                $SED "s|^Lua \(.*\)|\1|" | \
-                $EGREP -o "^@<:@0-9@:>@+\.@<:@0-9@:>@+"`
+                $SED -n "s|^Lua \(@<:@0-9@:>@\{1,\}\.@<:@0-9@:>@\{1,\}\).\{0,\}|\1|p"`
             ],
             [ax_cv_lua_header_version='unknown'])
           CPPFLAGS=$_ax_lua_saved_cppflags
