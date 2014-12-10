@@ -13,7 +13,7 @@ function leave_dir {
 	echo "[LEAVING $(basename $(pwd))]"
 	rm -rf .deps .libs
 	rm -rf aclocal.m4 autom4te.cache m4
-	rm -rf install-sh missing libtool ltmain.sh depcomp
+	rm -rf install-sh missing libtool ltmain.sh depcomp compile
 	rm -rf config.log config.status config.guess config.sub configure
 	rm -rf Makefile Makefile.in
 	rm -rf local_install
@@ -93,4 +93,3 @@ enter_dir 'minmaxreq' # tests v >= 5.1, < 5.2
 conf_test '' 'LUA=lua5.1'
 neg_conf_test 'LUA=lua50' 'LUA=lua5.2' 'LUA=badinterp'
 leave_dir
-
