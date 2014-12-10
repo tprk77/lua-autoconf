@@ -232,12 +232,14 @@ AC_DEFUN([AX_PROG_LUA],
       [AC_PATH_PROGS([LUA], [_AX_LUA_INTERPRETER_LIST], [:])])
     ax_display_LUA='lua'
 
-    dnl At least check if this is a Lua interpreter.
-    AC_MSG_CHECKING([if $LUA is a Lua interpreter])
-    _AX_LUA_CHK_IS_INTRP([$LUA],
-      [AC_MSG_RESULT([yes])],
-      [ AC_MSG_RESULT([no])
-        AC_MSG_ERROR([not a Lua interpreter])
+    AS_IF([test "x$LUA" != 'x:'],
+      [ dnl At least check if this is a Lua interpreter.
+        AC_MSG_CHECKING([if $LUA is a Lua interpreter])
+        _AX_LUA_CHK_IS_INTRP([$LUA],
+          [AC_MSG_RESULT([yes])],
+          [ AC_MSG_RESULT([no])
+            AC_MSG_ERROR([not a Lua interpreter])
+          ])
       ])
   ],
   [ dnl A version check is needed.
@@ -380,6 +382,7 @@ dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 [
   dnl Just print _VERSION because all Lua interpreters have this global.
+  dnl TODO This should be a more convincing test... Factorial?
   AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" &>/dev/null],
     [$2], [$3])
 ])
