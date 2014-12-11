@@ -58,9 +58,6 @@
 #   number greater or equal to MINIMUM-VERSION and less than TOO-BIG-VERSION
 #   will be accepted.
 #
-#   Version comparisons require the AX_COMPARE_VERSION macro, which is
-#   provided by ax_compare_version.m4 from the Autoconf Archive.
-#
 #   The Lua version number, LUA_VERSION, is found from the interpreter, and
 #   substituted. LUA_PLATFORM is also found, but not currently supported (no
 #   standard representation).
@@ -169,8 +166,8 @@
 #
 # LICENSE
 #
+#   Copyright (C) 2014 Reuben Thomas <rrt@sc3d.org>
 #   Copyright (C) 2013 Tim Perkins <tprk77@gmail.com>
-#   Copyright (C) 2013 Reuben Thomas <rrt@sc3d.org>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -288,9 +285,7 @@ AC_DEFUN([AX_PROG_LUA],
   ],
   [ dnl Query Lua for its version number.
     AC_CACHE_CHECK([for $ax_display_LUA version], [ax_cv_lua_version],
-      [ ax_cv_lua_version=`$LUA -e "print(_VERSION)" | \
-          $SED -n "s|^Lua \(@<:@0-9@:>@\{1,\}\.@<:@0-9@:>@\{1,\}\).\{0,\}|\1|p"`
-      ])
+      [ ax_cv_lua_version=`$LUA -e 'print(_VERSION:match "(%d+%.%d+)")'` ])
     AS_IF([test "x$ax_cv_lua_version" = 'x'],
       [AC_MSG_ERROR([invalid Lua version number])])
     AC_SUBST([LUA_VERSION], [$ax_cv_lua_version])
@@ -352,7 +347,7 @@ AC_DEFUN([AX_PROG_LUA],
 
         dnl Try to find a path with the prefix.
         _AX_LUA_FND_PRFX_PTH([$LUA],
-          [$ax_lua_exec_prefix], [package.cpathd])
+          [$ax_lua_exec_prefix], [package.cpath])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
           _ax_strip_prefix=`echo "$ax_lua_exec_prefix" | $SED 's|.|.|g'`
@@ -383,7 +378,7 @@ AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 [
   dnl Just print _VERSION because all Lua interpreters have this global.
   dnl TODO This should be a more convincing test... Factorial?
-  AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" &>/dev/null],
+  AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" >/dev/null 2>&1],
     [$2], [$3])
 ])
 
@@ -394,16 +389,13 @@ dnl                 [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_VER],
 [
-  _ax_test_ver=`$1 -e "print(_VERSION)" 2>/dev/null | \
-    $SED -n "s|^Lua \(@<:@0-9@:>@\{1,\}\.@<:@0-9@:>@\{1,\}\).\{0,\}|\1|p"`
-  AS_IF([test "x$_ax_test_ver" = 'x'],
-    [_ax_test_ver='0'])
-  AX_COMPARE_VERSION([$_ax_test_ver], [ge], [$2])
-  m4_if([$3], [], [],
-    [ AS_IF([$ax_compare_version],
-        [AX_COMPARE_VERSION([$_ax_test_ver], [lt], [$3])])
-    ])
-  AS_IF([$ax_compare_version], [$4], [$5])
+  AS_IF([$1 2>/dev/null -e '
+        function norm (v)
+          i,j=v:match "(%d+)%.(%d+)" if i then return 100 * i + j end
+        end
+        v, toobig=norm (_VERSION), norm "$3" or math.huge
+        os.exit ((v >= norm ("$2") and v < toobig) and 0 or 1)'],
+    [$4], [$5])
 ])
 
 
@@ -501,7 +493,7 @@ AC_DEFUN([AX_LUA_HEADERS],
       done
     ])
 
-  AS_IF([test "x$ac_cv_header_lua_h" = 'xyes'],
+  AS_IF([test "x$ac_cv_header_lua_h" = 'xyes' && test "x$cross_compiling" != 'xyes'],
     [ dnl Make a program to print LUA_VERSION defined in the header.
       dnl TODO This probably shouldn't be a runtime test.
 
@@ -537,6 +529,9 @@ int main(int argc, char ** argv)
         [ AC_MSG_RESULT([no])
           ax_header_version_match='no'
         ])
+    ],
+    [
+        ax_header_version_match='yes'
     ])
 
   dnl Was LUA_INCLUDE specified?
