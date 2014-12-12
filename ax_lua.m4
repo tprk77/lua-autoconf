@@ -376,9 +376,19 @@ dnl _AX_LUA_CHK_IS_INTRP(PROG, [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_IS_INTRP],
 [
-  dnl Just print _VERSION because all Lua interpreters have this global.
-  dnl TODO This should be a more convincing test... Factorial?
-  AS_IF([$1 -e "print('Hello ' .. _VERSION .. '!')" >/dev/null 2>&1],
+  dnl A minimal Lua factorial to prove this is an interpreter. This should work
+  dnl for Lua interpreters version 5.0 and beyond.
+  _ax_lua_factorial=[`$1 2>/dev/null -e '
+    -- a simple factorial
+    function fact (n)
+      if n == 0 then
+        return 1
+      else
+        return n * fact(n-1)
+      end
+    end
+    print("fact(5) is " .. fact(5))'`]
+  AS_IF([test "$_ax_lua_factorial" = 'fact(5) is 120'],
     [$2], [$3])
 ])
 
