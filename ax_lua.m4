@@ -284,8 +284,15 @@ AC_DEFUN([AX_PROG_LUA],
     m4_default([$4], [AC_MSG_ERROR([cannot find suitable Lua interpreter])])
   ],
   [ dnl Query Lua for its version number.
-    AC_CACHE_CHECK([for $ax_display_LUA version], [ax_cv_lua_version],
-      [ ax_cv_lua_version=`$LUA -e 'print(_VERSION:match "(%d+%.%d+)")'` ])
+    AC_CACHE_CHECK([for $ax_display_LUA version],
+      [ax_cv_lua_version],
+      [ dnl Get the interpreter version in X.Y format. This should work for
+        dnl interpreters version 5.0 and beyond.
+        ax_cv_lua_version=[`$LUA -e '
+          -- return a version number in X.Y format
+          local _, _, ver = string.find(_VERSION, "^Lua (%d+%.%d+)")
+          print(ver)'`]
+      ])
     AS_IF([test "x$ax_cv_lua_version" = 'x'],
       [AC_MSG_ERROR([invalid Lua version number])])
     AC_SUBST([LUA_VERSION], [$ax_cv_lua_version])
@@ -294,8 +301,9 @@ AC_DEFUN([AX_PROG_LUA],
     dnl The following check is not supported:
     dnl At times (like when building shared libraries) you may want to know
     dnl which OS platform Lua thinks this is.
-    AC_CACHE_CHECK([for $ax_display_LUA platform], [ax_cv_lua_platform],
-      [ax_cv_lua_platform=`$LUA -e "print('unknown')"`])
+    AC_CACHE_CHECK([for $ax_display_LUA platform],
+      [ax_cv_lua_platform],
+      [ax_cv_lua_platform=[`$LUA -e 'print("unknown")'`]])
     AC_SUBST([LUA_PLATFORM], [$ax_cv_lua_platform])
 
     dnl Use the values of $prefix and $exec_prefix for the corresponding
