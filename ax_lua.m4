@@ -407,13 +407,28 @@ dnl                 [ACTION-IF-TRUE], [ACTION-IF-FALSE])
 dnl =========================================================================
 AC_DEFUN([_AX_LUA_CHK_VER],
 [
-  AS_IF([$1 2>/dev/null -e '
-        function norm (v)
-          i,j=v:match "(%d+)%.(%d+)" if i then return 100 * i + j end
-        end
-        v, toobig=norm (_VERSION), norm "$3" or math.huge
-        os.exit ((v >= norm ("$2") and v < toobig) and 0 or 1)'],
-    [$4], [$5])
+  dnl Check that the Lua version is within the bounds. Only the major and minor
+  dnl version numbers are considered. This should work for Lua interpreters
+  dnl version 5.0 and beyond.
+  _ax_lua_good_version=[`$1 -e '
+    -- a script to compare versions
+    function verstr2num(verstr)
+      local _, _, majorver, minorver = string.find(verstr, "^(%d+)%.(%d+)")
+      if majorver and minorver then
+        return majorver * 100 + minorver
+      end
+    end
+    local minver = verstr2num("$2")
+    local _, _, trimver = string.find(_VERSION, "^Lua (.*)")
+    local ver = verstr2num(trimver)
+    local maxver = verstr2num("$3") or 1e9
+    if minver <= ver and ver < maxver then
+      print("yes")
+    else
+      print("no")
+    end'`]
+    AS_IF([test "x$_ax_lua_good_version" = "xyes"],
+      [$4], [$5])
 ])
 
 
