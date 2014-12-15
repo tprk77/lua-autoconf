@@ -433,25 +433,44 @@ AC_DEFUN([_AX_LUA_CHK_VER],
 
 
 dnl =========================================================================
-dnl _AX_LUA_FND_PRFX_PTH(PROG, PREFIX, LUA-PATH-VARIABLE)
+dnl _AX_LUA_FND_PRFX_PTH(PROG, PREFIX, SCRIPT-OR-MODULE-DIR)
 dnl =========================================================================
 AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
 [
-  dnl Invokes the Lua interpreter PROG to print the path variable
-  dnl LUA-PATH-VARIABLE, usually package.path or package.cpath. Paths are
-  dnl then matched against PREFIX. Then ax_lua_prefixed_path is set to the
-  dnl shortest sub path beginning with PREFIX up to the last directory
-  dnl that does not contain a '?', if any.
+  dnl Get the script or module directory by querying the Lua interpreter,
+  dnl filtering on the given prefix, and selecting the shallowest path. If no
+  dnl path  is found matching the prefix, the result will be an empty string.
+  dnl The third argument determines the type of search, it can be 'script' or
+  dnl 'module'. Supplying 'script' will perform the search with package.path
+  dnl and LUA_PATH, and supplying 'module' will search with package.cpath and
+  dnl LUA_CPATH. This is done for compatibility with Lua 5.0.
 
-  ax_lua_prefixed_path=`$1 2>/dev/null -e '
-    $3:gsub ("(@<:@^;@:>@+)",
-      function (p)
-        p = p:gsub ("%?.*$", ""):gsub ("/@<:@^/@:>@*$", "")
-        if p:match ("^$2") and (not shortest or #shortest > #p) then
-          shortest = p
+  ax_lua_prefixed_path=[`$1 -e '
+    -- get the path based on search type
+    local searchtype = "$3"
+    local paths = ""
+    if searchtype == "script" then
+      paths = (package and package.path) or LUA_PATH
+    elseif searchtype == "module" then
+      paths = (package and package.cpath) or LUA_CPATH
+    end
+    -- search for the prefix
+    local prefix = "$2"
+    local minpath = ""
+    local mindepth = 1e9
+    string.gsub(paths, "(@<:@^;@:>@+)",
+      function (path)
+        path = string.gsub(path, "%?.*$", "")
+        path = string.gsub(path, "/@<:@^/@:>@*$", "")
+        if string.find(path, prefix) then
+          local depth = string.len(string.gsub(path, "@<:@^/@:>@", ""))
+          if depth < mindepth then
+            minpath = path
+            mindepth = depth
+          end
         end
       end)
-    print (shortest or "")'`
+    print(minpath)'`]
 ])
 
 
