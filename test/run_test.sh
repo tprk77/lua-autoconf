@@ -93,3 +93,8 @@ enter_dir 'minmaxreq' # tests v >= 5.1, < 5.2
 conf_test '' 'LUA=lua5.1'
 neg_conf_test 'LUA=lua50' 'LUA=lua5.2' 'LUA=badinterp'
 leave_dir
+
+enter_dir 'minmaxreq50' # tests v >= 5.0, < 5.1
+conf_test '' 'LUA=lua50'
+neg_conf_test 'LUA=lua5.1' 'LUA=lua5.2' 'LUA=badinterp'
+leave_dir
