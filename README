@@ -58,9 +58,6 @@ DESCRIPTION
   number greater or equal to MINIMUM-VERSION and less than TOO-BIG-VERSION
   will be accepted.
 
-  Version comparisons require the AX_COMPARE_VERSION macro, which is
-  provided by ax_compare_version.m4 from the Autoconf Archive.
-
   The Lua version number, LUA_VERSION, is found from the interpreter, and
   substituted. LUA_PLATFORM is also found, but not currently supported (no
   standard representation).
@@ -169,8 +166,8 @@ DESCRIPTION
 
 LICENSE
 
-  Copyright (C) 2013 Tim Perkins <tprk77@gmail.com>
-  Copyright (C) 2013 Reuben Thomas <rrt@sc3d.org>
+  Copyright (C) 2014 Tim Perkins <tprk77@gmail.com>
+  Copyright (C) 2014 Reuben Thomas <rrt@sc3d.org>
 
   This program is free software: you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
