@@ -52,11 +52,11 @@
 #   interpreter. If LUA is blank, the user's path is searched for an
 #   suitable interpreter.
 #
-#   If MINIMUM-VERSION is supplied, then only Lua interpreters with a version
-#   number greater or equal to MINIMUM-VERSION will be accepted. If TOO-BIG-
-#   VERSION is also supplied, then only Lua interpreters with a version
-#   number greater or equal to MINIMUM-VERSION and less than TOO-BIG-VERSION
-#   will be accepted.
+#   If MINIMUM-VERSION is supplied, then only Lua interpreters with a
+#   version number greater or equal to MINIMUM-VERSION will be accepted. If
+#   TOO-BIG-VERSION is also supplied, then only Lua interpreters with a
+#   version number greater or equal to MINIMUM-VERSION and less than
+#   TOO-BIG-VERSION will be accepted.
 #
 #   The Lua version number, LUA_VERSION, is found from the interpreter, and
 #   substituted. LUA_PLATFORM is also found, but not currently supported (no
@@ -69,12 +69,13 @@
 #     luaexecdir         Directory to install Lua modules.
 #     pkgluaexecdir      $luaexecdir/$PACKAGE
 #
-#   These paths a found based on $prefix, $exec_prefix, Lua's package.path,
-#   and package.cpath. The first path of package.path beginning with $prefix
-#   is selected as luadir. The first path of package.cpath beginning with
-#   $exec_prefix is used as luaexecdir. This should work on all reasonable
-#   Lua installations. If a path cannot be determined, a default path is
-#   used. Of course, the user can override these later when invoking make.
+#   These paths are found based on $prefix, $exec_prefix, Lua's
+#   package.path, and package.cpath. The first path of package.path
+#   beginning with $prefix is selected as luadir. The first path of
+#   package.cpath beginning with $exec_prefix is used as luaexecdir. This
+#   should work on all reasonable Lua installations. If a path cannot be
+#   determined, a default path is used. Of course, the user can override
+#   these later when invoking make.
 #
 #     luadir             Default: $prefix/share/lua/$LUA_VERSION
 #     luaexecdir         Default: $exec_prefix/lib/lua/$LUA_VERSION
@@ -166,8 +167,8 @@
 #
 # LICENSE
 #
-#   Copyright (C) 2014 Tim Perkins <tprk77@gmail.com>
-#   Copyright (C) 2014 Reuben Thomas <rrt@sc3d.org>
+#   Copyright (C) 2015 Tim Perkins <tprk77@gmail.com>
+#   Copyright (C) 2015 Reuben Thomas <rrt@sc3d.org>
 #
 #   This program is free software: you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published by the
@@ -328,7 +329,7 @@ AC_DEFUN([AX_PROG_LUA],
         ax_cv_lua_luadir="$LUA_PREFIX/share/lua/$LUA_VERSION"
 
         dnl Try to find a path with the prefix.
-        _AX_LUA_FND_PRFX_PTH([$LUA], [$ax_lua_prefix], [package.path])
+        _AX_LUA_FND_PRFX_PTH([$LUA], [$ax_lua_prefix], [script])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
           _ax_strip_prefix=`echo "$ax_lua_prefix" | $SED 's|.|.|g'`
@@ -355,7 +356,7 @@ AC_DEFUN([AX_PROG_LUA],
 
         dnl Try to find a path with the prefix.
         _AX_LUA_FND_PRFX_PTH([$LUA],
-          [$ax_lua_exec_prefix], [package.cpath])
+          [$ax_lua_exec_prefix], [module])
         AS_IF([test "x$ax_lua_prefixed_path" != 'x'],
         [ dnl Fix the prefix.
           _ax_strip_prefix=`echo "$ax_lua_exec_prefix" | $SED 's|.|.|g'`
@@ -439,7 +440,7 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
 [
   dnl Get the script or module directory by querying the Lua interpreter,
   dnl filtering on the given prefix, and selecting the shallowest path. If no
-  dnl path  is found matching the prefix, the result will be an empty string.
+  dnl path is found matching the prefix, the result will be an empty string.
   dnl The third argument determines the type of search, it can be 'script' or
   dnl 'module'. Supplying 'script' will perform the search with package.path
   dnl and LUA_PATH, and supplying 'module' will search with package.cpath and
@@ -455,7 +456,7 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
       paths = (package and package.cpath) or LUA_CPATH
     end
     -- search for the prefix
-    local prefix = "$2"
+    local prefix = "'$2'"
     local minpath = ""
     local mindepth = 1e9
     string.gsub(paths, "(@<:@^;@:>@+)",
