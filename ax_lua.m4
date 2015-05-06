@@ -456,7 +456,7 @@ AC_DEFUN([_AX_LUA_FND_PRFX_PTH],
       paths = (package and package.cpath) or LUA_CPATH
     end
     -- search for the prefix
-    local prefix = "'$2'"
+    local prefix = "'"$2"'"
     local minpath = ""
     local mindepth = 1e9
     string.gsub(paths, "(@<:@^;@:>@+)",
