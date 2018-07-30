@@ -167,7 +167,7 @@
 #
 # LICENSE
 #
-#   Copyright (C) 2015 Tim Perkins <tprk77@gmail.com>
+#   Copyright (C) 2018 Tim Perkins <tprk77@gmail.com>
 #   Copyright (C) 2015 Reuben Thomas <rrt@sc3d.org>
 #
 #   This program is free software: you can redistribute it and/or modify it
